@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	ReadArray(moduleFile, header.numCompressedBlocks, &compressedBlocks[0]);
 	WriteArray(&compressedBlocks[0], header.numCompressedBlocks, outputDir / "block_index");
 
-	auto compressedDataStart = static_cast<size_t>(moduleFile.tellg());
+	auto compressedDataStart = static_cast<int64_t>(moduleFile.tellg());
 
 	for (auto i = 0; i < header.numFiles; i++)
 	{

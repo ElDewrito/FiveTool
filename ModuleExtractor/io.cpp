@@ -4,12 +4,12 @@
 
 using namespace std::experimental;
 
-void ReadData(std::ifstream& stream, size_t size, uint8_t* out)
+void ReadData(std::ifstream& stream, int64_t size, uint8_t* out)
 {
 	stream.read(reinterpret_cast<char*>(out), size);
 }
 
-void WriteData(const uint8_t* data, size_t size, const filesystem::path& path)
+void WriteData(const uint8_t* data, int64_t size, const filesystem::path& path)
 {
 	std::ofstream file(path.native(), std::ios::binary | std::ios::trunc);
 	file.write(reinterpret_cast<const char*>(data), size);
