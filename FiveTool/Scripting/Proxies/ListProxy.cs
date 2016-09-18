@@ -13,7 +13,7 @@ namespace FiveTool.Scripting.Proxies
     /// This is significantly faster than MoonSharp's default list-to-table conversion.
     /// </summary>
     [MoonSharpUserData]
-    internal class ListProxy<T> : IEnumerable<T>
+    internal class ListProxy<T>
     {
         private readonly IList<T> _list;
 
@@ -74,16 +74,6 @@ namespace FiveTool.Scripting.Proxies
                 return DynValue.NewTuple(nextIndexValue, itemValue);
             });
             return DynValue.NewTuple(DynValue.NewCallback(callback), DynValue.Nil, DynValue.NewNumber(0));
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _list.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _list.GetEnumerator();
         }
     }
 }

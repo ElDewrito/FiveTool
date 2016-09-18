@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="Scripting\BuiltIns\Modules.lua" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

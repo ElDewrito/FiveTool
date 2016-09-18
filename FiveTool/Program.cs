@@ -27,21 +27,21 @@ namespace FiveTool
             Console.WriteLine("Starting interactive Lua (MoonSharp) shell.");
             Console.Write("Use ");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("help()");
+            Console.Write("Help()");
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write(" for help and ");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("exit()");
+            Console.Write("Exit()");
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine(" to stop.");
+            Console.WriteLine(" to quit.");
             Console.WriteLine();
 
             ScriptFactory.Initialize();
             var script = ScriptFactory.CreateScript();
 
             var done = false;
-            script.Globals["help"] = (Action)PrintHelp;
-            script.Globals["exit"] = (Action)(() => { done = true; });
+            script.Globals["Help"] = (Action)PrintHelp;
+            script.Globals["Exit"] = (Action)(() => { done = true; });
 
             while (!done)
             {
