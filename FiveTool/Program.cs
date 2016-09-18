@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using FiveTool.Scripting;
 using MoonSharp.Interpreter;
 
 namespace FiveTool
@@ -35,9 +36,10 @@ namespace FiveTool
             Console.WriteLine(" to stop.");
             Console.WriteLine();
 
-            var done = false;
-            var script = new Script(CoreModules.Preset_SoftSandbox);
+            ScriptFactory.Initialize();
+            var script = ScriptFactory.CreateScript();
 
+            var done = false;
             script.Globals["help"] = (Action)PrintHelp;
             script.Globals["exit"] = (Action)(() => { done = true; });
 
@@ -64,7 +66,6 @@ namespace FiveTool
                     }
                     if (result.IsNotVoid())
                         Console.WriteLine(result.ToString());
-                    Console.WriteLine();
                 }
                 catch (InterpreterException e)
                 {
@@ -74,8 +75,9 @@ namespace FiveTool
                 catch (Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(e.ToString());
+                    Console.WriteLine(e.Message);
                 }
+                Console.WriteLine();
             }
         }
 

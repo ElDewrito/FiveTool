@@ -27,24 +27,29 @@ namespace FiveLib.Ausar.Module
         {
             _stream = stream;
             DataBaseOffset = stream.Position;
+
             _entries.AddRange(entries);
             _resources.AddRange(resources);
+
             _entriesByName = _entries.ToDictionary(e => e.Name, e => e);
             _entriesByGlobalTagId = _entries
                 .Where(e => e.GlobalTagId != -1)
                 .ToDictionary(e => e.GlobalTagId, e => e);
+
+            Entries = _entries.AsReadOnly();
+            Resources = _resources.AsReadOnly();
         }
 
         /// <summary>
-        /// Gets the entries for files stored in the module.
+        /// Gets the entries for files stored in the module. Read-only.
         /// </summary>
-        public IReadOnlyList<ModuleEntry> Entries => _entries;
+        public IList<ModuleEntry> Entries { get; }
 
         /// <summary>
-        /// Gets the entries for resource files stored in the module.
+        /// Gets the entries for resource files stored in the module. Read-only.
         /// These entries can also be found in the main <see cref="Entries"/> list.
         /// </summary>
-        public IReadOnlyList<ModuleEntry> Resources => _resources;
+        public IList<ModuleEntry> Resources { get; }
 
         /// <summary>
         /// Gets the file offset where compressed data begins.
@@ -57,7 +62,7 @@ namespace FiveLib.Ausar.Module
         /// <param name="name">The filename to search for.</param>
         /// <param name="entry">The result variable.</param>
         /// <returns><c>true</c> if the entry was found.</returns>
-        public bool FindEntryByName(string name, out ModuleEntry entry)
+        public bool GetEntryByName(string name, out ModuleEntry entry)
         {
             return _entriesByName.TryGetValue(name, out entry);
         }
@@ -68,7 +73,7 @@ namespace FiveLib.Ausar.Module
         /// <param name="id">The global tag ID to search for.</param>
         /// <param name="entry">The result variable.</param>
         /// <returns><c>true</c> if the entry was found.</returns>
-        public bool FindEntryByGlobalTagId(int id, out ModuleEntry entry)
+        public bool GetEntryByGlobalTagId(int id, out ModuleEntry entry)
         {
             return _entriesByGlobalTagId.TryGetValue(id, out entry);
         }

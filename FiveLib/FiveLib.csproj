@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Ausar\Module\AusarModule.cs" />
     <Compile Include="Ausar\Module\ModuleEntry.cs" />
+    <Compile Include="Ausar\Module\ModuleEntryBlock.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleCompressedBlockStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleEntryStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleFileHeaderStruct.cs" />

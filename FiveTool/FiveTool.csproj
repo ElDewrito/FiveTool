@@ -49,10 +49,21 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripting\Proxies\Ausar\Module\AusarModuleProxy.cs" />
+    <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryBlockProxy.cs" />
+    <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryProxy.cs" />
+    <Compile Include="Scripting\Proxies\ListProxy.cs" />
+    <Compile Include="Scripting\ScriptFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FiveLib\FiveLib.csproj">
+      <Project>{AE39B203-E9FB-4722-A525-D1958F4C54E8}</Project>
+      <Name>FiveLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

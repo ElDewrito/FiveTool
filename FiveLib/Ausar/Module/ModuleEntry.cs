@@ -23,7 +23,7 @@ namespace FiveLib.Ausar.Module
 
         public int UnknownC { get; }
 
-        public IReadOnlyList<ModuleEntryBlock> Blocks { get; }
+        public IList<ModuleEntryBlock> Blocks { get; }
 
         public ulong CompressedOffset { get; }
 
@@ -65,11 +65,7 @@ namespace FiveLib.Ausar.Module
             ParentIndex = data.ParentFileIndex;
             Unknown8 = data.Unknown8;
             UnknownC = data.UnknownC;
-            Blocks = module.CompressedBlocks
-                .Skip(data.FirstCompressedBlockIndex)
-                .Take(data.CompressedBlockCount)
-                .Select(b => new ModuleEntryBlock(b))
-                .ToList();
+            Blocks = GetBlockList(data, module).AsReadOnly();
             CompressedOffset = data.CompressedOffset;
             TotalCompressedSize = data.TotalCompressedSize;
             TotalUncompressedSize = data.TotalUncompressedSize;
@@ -88,33 +84,16 @@ namespace FiveLib.Ausar.Module
             Unknown52 = data.Unknown52;
             Unknown54 = data.Unknown54;
         }
-    }
 
-    public class ModuleEntryBlock
-    {
-        public long Unknown0 { get; }
-
-        public uint CompressedOffset { get; }
-
-        public uint CompressedSize { get; }
-
-        public uint UncompressedOffset { get; }
-
-        public uint UncompressedSize { get; }
-
-        public int Unknown18 { get; }
-
-        public int Unknown1C { get; }
-
-        internal ModuleEntryBlock(ModuleCompressedBlockStruct data)
+        private static List<ModuleEntryBlock> GetBlockList(ModuleEntryStruct data, ModuleStruct module)
         {
-            Unknown0 = data.Unknown0;
-            CompressedOffset = data.CompressedOffset;
-            CompressedSize = data.CompressedSize;
-            UncompressedOffset = data.UncompressedOffset;
-            UncompressedSize = data.UncompressedSize;
-            Unknown18 = data.Unknown18;
-            Unknown1C = data.Unknown1C;
-        }
+            var blocks = new List<ModuleEntryBlock>(data.CompressedBlockCount);
+            for (var i = 0; i < data.CompressedBlockCount; i++)
+            {
+                var block = module.CompressedBlocks[data.FirstCompressedBlockIndex + i];
+                blocks.Add(new ModuleEntryBlock(block));
+            }
+            return blocks;
+        } 
     }
 }
