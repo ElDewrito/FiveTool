@@ -40,13 +40,13 @@ namespace FiveTool
             var script = ScriptFactory.CreateScript();
 
             var done = false;
-            script.Globals["Help"] = (Action)PrintHelp;
             script.Globals["Exit"] = (Action)(() => { done = true; });
 
             while (!done)
             {
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.Write("lua> ");
+                Console.ForegroundColor = ConsoleColor.White;
                 var line = Console.ReadLine();
                 Console.ForegroundColor = ConsoleColor.Gray;
                 if (string.IsNullOrWhiteSpace(line))
@@ -79,11 +79,6 @@ namespace FiveTool
                 }
                 Console.WriteLine();
             }
-        }
-
-        private static void PrintHelp()
-        {
-            Console.WriteLine("Not finished yet...");
         }
     }
 }

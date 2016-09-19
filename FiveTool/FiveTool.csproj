@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripting\BuiltIns\ConsoleBuiltIns.cs" />
+    <Compile Include="Scripting\BuiltIns\IoBuiltIns.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\AusarModuleProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryBlockProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryProxy.cs" />
@@ -59,6 +61,8 @@
     <None Include="App.config" />
     <EmbeddedResource Include="Scripting\BuiltIns\Modules.lua" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Scripting\BuiltIns\Help.lua" />
+    <EmbeddedResource Include="Scripting\BuiltIns\Console.lua" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FiveLib\FiveLib.csproj">

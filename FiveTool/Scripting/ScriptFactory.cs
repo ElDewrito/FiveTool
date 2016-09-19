@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Module;
+using FiveTool.Scripting.BuiltIns;
 using FiveTool.Scripting.Proxies.Ausar.Module;
 using MoonSharp.Interpreter;
 
@@ -13,6 +14,13 @@ namespace FiveTool.Scripting
     internal static class ScriptFactory
     {
         private const string BuiltInsNamespace = "BuiltIns";
+
+        private static readonly string[] BuiltInScripts =
+        {
+            "Help.lua", // Must be run first
+            "Console.lua",
+            "Modules.lua",
+        };
 
         public static void Initialize()
         {
@@ -28,23 +36,27 @@ namespace FiveTool.Scripting
 
             script.Globals["Module"] = UserData.CreateStatic(typeof(AusarModuleProxy));
 
-            RunBuiltIns(script);
+            RegisterBuiltIns(script);
             return script;
         }
 
-        private static void RunBuiltIns(Script script)
+        private static void RegisterBuiltIns(Script script)
         {
-            // Find all lua files in <namespace>.BuiltIns
+            IoBuiltIns.Register(script);
+            ConsoleBuiltIns.Register(script);
+
+            foreach (var name in BuiltInScripts)
+                RunBuiltInScript(script, name);
+        }
+
+        private static void RunBuiltInScript(Script script, string name)
+        {
             var assembly = Assembly.GetExecutingAssembly();
-            var resources = assembly.GetManifestResourceNames();
             var ns = typeof(ScriptFactory).Namespace + "." + BuiltInsNamespace;
-            foreach (var resource in resources.Where(r => r.StartsWith(ns) && r.EndsWith(".lua")))
+            using (var stream = assembly.GetManifestResourceStream(ns + "." + name))
             {
-                using (var stream = assembly.GetManifestResourceStream(resource))
-                {
-                    var loaded = script.LoadStream(stream, null, resource);
-                    script.Call(loaded);
-                }
+                var loaded = script.LoadStream(stream, null, name);
+                script.Call(loaded);
             }
         }
     }
