@@ -15,30 +15,58 @@ namespace FiveTool
     {
         private static void Main(string[] args)
         {
-            Console.ForegroundColor = ConsoleColor.White;
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            Console.WriteLine("FiveTool [{0}.{1}.{2}]", version.Major, version.Minor, version.Revision);
-            Console.WriteLine();
+            if (args.Length > 1)
+            {
+                Console.WriteLine("Usage: FiveTool [script path]");
+                return;
+            }
 
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("Please submit bug reports, pull requests, and feature requests to");
-            Console.WriteLine("<https://github.com/Shockfire/FiveTool>.");
-            Console.WriteLine();
+            var scriptPath = args.Length > 0 ? args[0] : null;
+            if (scriptPath == null)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
+                Console.WriteLine("FiveTool [{0}.{1}.{2}]", version.Major, version.Minor, version.Revision);
+                Console.WriteLine();
 
-            Console.WriteLine("Starting interactive Lua (MoonSharp) shell.");
-            Console.Write("Use ");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("Help()");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write(" for help and ");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("Exit()");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine(" to quit.");
-            Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("Please submit bug reports, pull requests, and feature requests to");
+                Console.WriteLine("<https://github.com/Shockfire/FiveTool>.");
+                Console.WriteLine();
+
+                Console.WriteLine("Starting interactive Lua (MoonSharp) shell.");
+                Console.Write("Use ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("Help()");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write(" for help and ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("Exit()");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine(" to quit.");
+                Console.WriteLine();
+            }
 
             ScriptFactory.Initialize();
             var script = ScriptFactory.CreateScript();
+
+            // If a script file was passed in, run it and return
+            if (scriptPath != null)
+            {
+                try
+                {
+                    script.DoFile(scriptPath);
+                }
+                catch (InterpreterException e)
+                {
+                    Console.Error.WriteLine("Error: " + e.DecoratedMessage);
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Error: " + e.Message);
+                }
+                return;
+            }
 
             var done = false;
             script.Globals["Exit"] = (Action)(() => { done = true; });
