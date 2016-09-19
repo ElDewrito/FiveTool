@@ -55,6 +55,8 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             return new AusarModuleProxy(module, stream);
         }
 
+        public override string ToString() => $"(AusarModule, {Entries.Count} entries)";
+
         ~AusarModuleProxy()
         {
             Dispose(false);

@@ -16,7 +16,7 @@ local PrintAllHelp
 function DefineHelp (groupName, fnName, help)
 	fn = _G[fnName]
 	if fn == nil then
-		error("Unable to find global function \"" + fnName + "\"")
+		error("Unable to find global function \"" .. fnName .. "\"")
 	end
 	help.name = fnName
 	helpByFunction[fn] = help

@@ -32,5 +32,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
         public int Unknown18 => _block.Unknown18;
 
         public int Unknown1C => _block.Unknown1C;
+
+        public override string ToString() => "(ModuleEntryBlock)";
     }
 }

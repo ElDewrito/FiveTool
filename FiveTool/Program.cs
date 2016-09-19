@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FiveTool.Scripting;
+using FiveTool.Scripting.BuiltIns;
 using MoonSharp.Interpreter;
 
 namespace FiveTool
@@ -65,7 +66,11 @@ namespace FiveTool
                         result = script.DoString(line);
                     }
                     if (result.IsNotVoid())
-                        Console.WriteLine(result.ToString());
+                    {
+                        // Dump without recursion to display the value in a friendly format
+                        DumpBuiltIns.Dump(script, result, 0);
+                        Console.WriteLine();
+                    }
                 }
                 catch (InterpreterException e)
                 {

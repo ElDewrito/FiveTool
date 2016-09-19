@@ -34,7 +34,7 @@ namespace FiveTool.Scripting
         {
             var script = new Script(CoreModules.Preset_SoftSandbox);
 
-            script.Globals["Module"] = UserData.CreateStatic(typeof(AusarModuleProxy));
+            script.Globals["AusarModule"] = UserData.CreateStatic(typeof(AusarModuleProxy));
 
             RegisterBuiltIns(script);
             return script;
@@ -44,6 +44,7 @@ namespace FiveTool.Scripting
         {
             IoBuiltIns.Register(script);
             ConsoleBuiltIns.Register(script);
+            DumpBuiltIns.Register(script);
 
             foreach (var name in BuiltInScripts)
                 RunBuiltInScript(script, name);

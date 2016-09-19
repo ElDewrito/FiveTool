@@ -62,5 +62,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
         public short Unknown52 => _entry.Unknown52;
 
         public int Unknown54 => _entry.Unknown54;
+
+        public override string ToString() => $"(ModuleEntry \"{Name}\")";
     }
 }

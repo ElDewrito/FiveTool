@@ -2,7 +2,7 @@
 
 function LoadModule (path)
 	if loadedModules[path] == nil then
-		loadedModules[path] = Module.LoadFromFile(path)
+		loadedModules[path] = AusarModule.LoadFromFile(path)
 	end
 	return loadedModules[path]
 end

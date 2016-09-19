@@ -7,7 +7,7 @@ using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting.BuiltIns
 {
-    internal class IoBuiltIns
+    internal static class IoBuiltIns
     {
         public static void Register(Script script)
         {
@@ -15,7 +15,7 @@ namespace FiveTool.Scripting.BuiltIns
             var ioTable = new Table(script)
             {
                 ["read"] = (Func<DynValue, DynValue>)Read,
-                ["write"] = DynValue.NewCallback(Write),
+                ["write"] = DynValue.NewCallback(Write, nameof(Write)),
                 ["flush"] = (Action)Flush,
             };
             script.Globals["io"] = ioTable;

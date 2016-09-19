@@ -46,7 +46,9 @@ namespace FiveTool.Scripting.Proxies
 
         public bool Remove(T item) => _list.Remove(item);
 
-        public void RemoveAt(int index) => _list.RemoveAt(index); 
+        public void RemoveAt(int index) => _list.RemoveAt(index);
+
+        public override string ToString() => $"({typeof(T).Name}[{Count}])";
 
         [MoonSharpUserDataMetamethod("__concat")]
         public static ListProxy<T> Concat(ListProxy<T> list1, ListProxy<T> list2)
