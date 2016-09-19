@@ -1,4 +1,4 @@
-# FiveTool
+# FiveTool [![Build status](https://ci.appveyor.com/api/projects/status/31y8fmes9186ojax?svg=true)](https://ci.appveyor.com/project/Shockfire/fivetool)
 
 FiveTool is an unofficial modding toolkit for Halo 5.
 The goal is to eventually create a powerful Lua-based system which can be used to inspect and modify game assets.
@@ -14,3 +14,7 @@ The easiest way to use it is to drag-and-drop a module file onto the program.
 You can also run it from the command line by passing in a path to a .module file and an optional output folder.
 
 There is currently no way to rebuild modules after individual files have been edited. Stay tuned!
+
+## Download
+
+You can find pre-built binaries on [AppVeyor](https://ci.appveyor.com/project/Shockfire/fivetool/build/artifacts).
