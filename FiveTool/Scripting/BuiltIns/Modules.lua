@@ -7,7 +7,7 @@ function LoadModule (path)
 	return loadedModules[path]
 end
 
-DefineHelp ("Module", "LoadModule", LoadModule, {
+DefineHelp ("Module", "LoadModule", {
 	shortDescription = "Load a module file",
 	longDescription = "Loads a module file.\nIts contents will be made accessible to other functions.",
 	args = {
@@ -29,7 +29,7 @@ function GetModuleEntry (name)
 	return nil
 end
 
-DefineHelp ("Module", "GetModuleEntry", GetModuleEntry, {
+DefineHelp ("Module", "GetModuleEntry", {
 	shortDescription = "Look up a module entry by name",
 	longDescription = "Looks up a module entry by name.\nThe name must match exactly.",
 	args = {
@@ -52,7 +52,7 @@ function FindModuleEntry (name)
 	return nil
 end
 
-DefineHelp ("Module", "FindModuleEntry", FindModuleEntry, {
+DefineHelp ("Module", "FindModuleEntry", {
 	shortDescription = "Find the first module entry matching a string",
 	longDescription = "Finds the first module entry matching a string.\nThe string can be anywhere in an entry's name.",
 	returns = "The module entry object if found, or nil otherwise.",
@@ -76,7 +76,7 @@ function FindModuleEntries (name)
 	return entries
 end
 
-DefineHelp ("Module", "FindModuleEntries", FindModuleEntries, {
+DefineHelp ("Module", "FindModuleEntries", {
 	shortDescription = "Find all module entries matching a string",
 	longDescription = "Finds all module entries matching a string.\nThe string can be anywhere in an entry's name.",
 	returns = "An array of all found entries.",

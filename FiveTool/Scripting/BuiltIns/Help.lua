@@ -13,7 +13,11 @@ local PrintAllHelp
 --   args - (Optional) Array of { argument, description } pairs
 --   returns - (Optional) Return value description
 --   examples - (Optional) Array of examples on how to use the function
-function DefineHelp (groupName, fnName, fn, help)
+function DefineHelp (groupName, fnName, help)
+	fn = _G[fnName]
+	if fn == nil then
+		error("Unable to find global function \"" + fnName + "\"")
+	end
 	help.name = fnName
 	helpByFunction[fn] = help
 	if helpByGroup[groupName] == nil then
@@ -45,7 +49,7 @@ function Help (search)
 	end
 end
 
-DefineHelp ("Core", "Help", Help, {
+DefineHelp ("Core", "Help", {
 	shortDescription = "Get help about a function or group of functions",
 	args = {
 		{ "search", "(Optional) The function or group name" },
@@ -53,7 +57,7 @@ DefineHelp ("Core", "Help", Help, {
 	examples = {
 		"Help()",
 		"Help(LoadModule)",
-		"Help(\"Modules\")",
+		"Help(\"Module\")",
 	},
 });
 
