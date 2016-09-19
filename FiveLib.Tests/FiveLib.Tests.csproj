@@ -53,6 +53,7 @@
     <Compile Include="Ausar\Module\Structures\ModuleCompressedBlockStructTests.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleEntryStructTests.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleFileHeaderStructTests.cs" />
+    <Compile Include="Ausar\Tags\StringIdTests.cs" />
     <Compile Include="Common\MagicNumberTests.cs" />
     <Compile Include="Common\StringBlobTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
