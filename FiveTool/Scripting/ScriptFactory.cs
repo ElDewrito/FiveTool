@@ -5,8 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Module;
+using FiveLib.Ausar.Tags;
 using FiveTool.Scripting.BuiltIns;
 using FiveTool.Scripting.Proxies.Ausar.Module;
+using FiveTool.Scripting.Proxies.Ausar.Tags;
 using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting
@@ -19,6 +21,7 @@ namespace FiveTool.Scripting
         {
             "Help.lua", // Must be run first
             "Console.lua",
+            "DataTypes.lua",
             "Modules.lua",
         };
 
@@ -42,6 +45,7 @@ namespace FiveTool.Scripting
 
         private static void RegisterBuiltIns(Script script)
         {
+            DataTypeBuiltIns.Register(script);
             IoBuiltIns.Register(script);
             ConsoleBuiltIns.Register(script);
             DumpBuiltIns.Register(script);

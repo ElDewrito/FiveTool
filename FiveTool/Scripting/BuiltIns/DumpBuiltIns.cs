@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FiveTool.Scripting.Proxies;
+using FiveTool.Scripting.Proxies.Ausar.Tags;
 using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting.BuiltIns
@@ -99,16 +100,21 @@ namespace FiveTool.Scripting.BuiltIns
             obj = ProxyUtil.GetUserDataAsProxy(data);
             type = obj.GetType();
 
-            if (depth == maxDepth)
-            {
-                Console.Write(obj);
-                return;
-            }
-
-            // Display lists nicely
+            // Special cases
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ListProxy<>))
             {
                 DumpList(script, type, obj, depth, maxDepth);
+                return;
+            }
+            if (type == typeof(StringIdProxy))
+            {
+                Console.Write($"(StringId {obj})");
+                return;
+            }
+
+            if (depth == maxDepth)
+            {
+                Console.Write(obj);
                 return;
             }
 
@@ -160,7 +166,14 @@ namespace FiveTool.Scripting.BuiltIns
             var itemProperty = type.GetProperty("Item");
             var count = (int)countProperty.GetValue(list);
 
-            Console.Write($"{type.GenericTypeArguments[0].Name}[{count}] {{");
+            var elementTypeName = type.GenericTypeArguments[0].Name;
+            if (depth == maxDepth)
+            {
+                Console.Write($"({elementTypeName}[{count}])");
+                return;
+            }
+
+            Console.Write($"{elementTypeName}[{count}] {{");
             for (var i = 1; i <= count; i++)
             {
                 if (i > 1)
