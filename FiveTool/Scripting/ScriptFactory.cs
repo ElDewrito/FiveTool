@@ -22,6 +22,7 @@ namespace FiveTool.Scripting
             "Help.lua", // Must be run first
             "Console.lua",
             "DataTypes.lua",
+            "Io.lua",
             "Modules.lua",
         };
 

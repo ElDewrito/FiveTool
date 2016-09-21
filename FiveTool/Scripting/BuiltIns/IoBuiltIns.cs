@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FiveTool.Scripting.Platform;
 using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting.BuiltIns
@@ -19,6 +21,7 @@ namespace FiveTool.Scripting.BuiltIns
                 ["flush"] = (Action)Flush,
             };
             script.Globals["io"] = ioTable;
+            script.Globals["ChooseGameFolder"] = (Func<bool>)FileAccessUtil.ChooseGameFolder;
         }
 
         private static DynValue Read(DynValue format)

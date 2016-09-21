@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Module;
+using FiveTool.Scripting.Platform;
 using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting.Proxies.Ausar.Module
@@ -50,6 +51,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public static AusarModuleProxy LoadFromFile(string path)
         {
+            path = FileAccessUtil.ResolvePath(path);
             var stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
             var module = AusarModule.Open(stream);
             return new AusarModuleProxy(module, stream);
