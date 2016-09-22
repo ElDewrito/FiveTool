@@ -1,6 +1,6 @@
 version: 0.1.{build}
 configuration: Release
-platform: Any CPU
+platform: x86
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
@@ -16,7 +16,12 @@ build:
   parallel: true
   verbosity: minimal
 after_build:
-- cmd: 7z a FiveTool.zip %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\Release\*.exe %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\Release\*.dll
+- cmd: >-
+    7z a FiveTool.zip %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\Release\*.exe %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\Release\*.dll
+
+    7z a ModuleExtractor.zip %APPVEYOR_BUILD_FOLDER%\Release\ModuleExtractor.exe
 artifacts:
 - path: FiveTool.zip
   name: FiveTool
+- path: ModuleExtractor.zip
+  name: ModuleExtractor
