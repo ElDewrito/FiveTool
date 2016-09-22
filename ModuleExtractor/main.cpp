@@ -13,6 +13,9 @@
 
 using namespace std::experimental;
 
+bool checkZlibResult(int result);
+void displayError(const std::string& error);
+
 int main(int argc, char *argv[])
 {
 	if (argc != 2 && argc != 3)
@@ -27,7 +30,7 @@ int main(int argc, char *argv[])
 	std::ifstream moduleFile(modulePath.native(), std::ios::binary);
 	if (!moduleFile)
 	{
-		std::cerr << "Failed to open " << modulePath << " for reading." << std::endl;
+		displayError("Failed to open " + modulePath.string() + " for reading");
 		return 1;
 	}
 	filesystem::create_directory(outputDir);
@@ -38,12 +41,12 @@ int main(int argc, char *argv[])
 	ReadStruct(moduleFile, header);
 	if (header.magic != BlamModuleHeaderMagic)
 	{
-		std::cerr << "Invalid module header" << std::endl;
+		displayError("Invalid module header");
 		return 1;
 	}
 	if (header.version != LatestBlamModuleVersion)
 	{
-		std::cerr << "Invalid module version" << std::endl;
+		displayError("Invalid module version");
 		return 1;
 	}
 	WriteStruct(header, outputDir / "header");
@@ -104,7 +107,9 @@ int main(int argc, char *argv[])
 
 				auto uncompressedOffset = block.uncompressedOffset;
 				uLongf actualUncompressedSize = block.uncompressedSize;
-				uncompress(&uncompressedData[uncompressedOffset], &actualUncompressedSize, &compressedData[0], compressedSize);
+				auto result = uncompress(&uncompressedData[uncompressedOffset], &actualUncompressedSize, &compressedData[0], compressedSize);
+				if (!checkZlibResult(result))
+					return 1;
 			}
 		}
 		else
@@ -116,12 +121,39 @@ int main(int argc, char *argv[])
 			ReadData(moduleFile, compressedSize, &compressedData[0]);
 
 			uncompressedData = std::make_unique<uint8_t[]>(uncompressedSize);
-			uncompress(&uncompressedData[0], &uncompressedSize, &compressedData[0], compressedSize);
+			auto result = uncompress(&uncompressedData[0], &uncompressedSize, &compressedData[0], compressedSize);
+			if (!checkZlibResult(result))
+				return 1;
 		}
 
-		auto tagPath = SanitizeFileName(outputDir / name);
-		filesystem::create_directories(tagPath.parent_path());
-		WriteData(&uncompressedData[0], uncompressedSize, tagPath);
+		try
+		{
+			auto tagPath = SanitizeFileName(outputDir / name);
+			filesystem::create_directories(tagPath.parent_path());
+			WriteData(&uncompressedData[0], uncompressedSize, tagPath);
+		}
+		catch (const std::exception& e)
+		{
+			displayError(e.what());
+			return 1;
+		}
 	}
 	return 0;
+}
+
+bool checkZlibResult(int result)
+{
+	if (result != Z_OK)
+	{
+		displayError("ZLib returned " + std::to_string(result) + " (" + zError(result) + ")");
+		return false;
+	}
+	return true;
+}
+
+void displayError(const std::string& error)
+{
+	std::cerr << "Extraction failed: " << error << std::endl;
+	std::cout << "Press Enter to quit..." << std::endl;
+	std::cin.ignore();
 }
