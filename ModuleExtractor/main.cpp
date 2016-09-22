@@ -63,11 +63,11 @@ int main(int argc, char *argv[])
 	ReadArray(moduleFile, header.fileNamesSize, &fileNames[0]);
 	WriteArray(&fileNames[0], header.fileNamesSize, outputDir / "names");
 
-	std::cout << "Reading root tag list..." << std::endl;
+	std::cout << "Reading resource list..." << std::endl;
 
-	auto rootTags = std::make_unique<uint32_t[]>(header.numRootTags);
-	ReadArray(moduleFile, header.numRootTags, &rootTags[0]);
-	WriteArray(&rootTags[0], header.numRootTags, outputDir / "root_tags");
+	auto resources = std::make_unique<uint32_t[]>(header.numResources);
+	ReadArray(moduleFile, header.numResources, &resources[0]);
+	WriteArray(&resources[0], header.numResources, outputDir / "resources");
 
 	std::cout << "Reading compressed block index..." << std::endl;
 

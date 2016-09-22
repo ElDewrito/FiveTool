@@ -17,9 +17,10 @@ struct BlamModuleHeader
 	int unknown14;
 	int unknown18;
 	int fileNamesSize;
-	int numRootTags;
+	int numResources;
 	int numCompressedBlocks;
-	uint8_t unknown28[0x10];
+	uint64_t unknown28;
+	uint64_t checksum;
 };
 EXPECT_SIZE(BlamModuleHeader, 0x38);
 
