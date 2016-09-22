@@ -82,7 +82,8 @@ int main(int argc, char *argv[])
 		auto& file = files[i];
 		auto name = &fileNames[file.nameOffset];
 
-		std::cout << "Extracting " << name << "..." << std::endl;
+		auto progress = i * 100 / header.numFiles;
+		std::cout << "[" << progress << "%] Extracting " << name << "..." << std::endl;
 
 		std::unique_ptr<uint8_t[]> uncompressedData;
 		uLongf uncompressedSize = file.totalUncompressedSize;
@@ -99,31 +100,43 @@ int main(int argc, char *argv[])
 			for (auto j = 0; j < file.compressedBlockCount; j++)
 			{
 				auto& block = compressedBlocks[file.firstCompressedBlockIndex + j];
-				auto compressedSize = block.compressedSize;
-				auto compressedData = std::make_unique<uint8_t[]>(compressedSize);
+				auto uncompressedOffset = block.uncompressedOffset;
 				auto fileOffset = compressedDataStart + file.compressedOffset + block.compressedOffset;
 				moduleFile.seekg(fileOffset, std::ios::beg);
-				ReadData(moduleFile, compressedSize, &compressedData[0]);
-
-				auto uncompressedOffset = block.uncompressedOffset;
-				uLongf actualUncompressedSize = block.uncompressedSize;
-				auto result = uncompress(&uncompressedData[uncompressedOffset], &actualUncompressedSize, &compressedData[0], compressedSize);
-				if (!checkZlibResult(result))
-					return 1;
+				if (block.compressed)
+				{
+					auto compressedSize = block.compressedSize;
+					auto compressedData = std::make_unique<uint8_t[]>(compressedSize);
+					ReadData(moduleFile, compressedSize, &compressedData[0]);
+					uLongf actualUncompressedSize = block.uncompressedSize;
+					auto result = uncompress(&uncompressedData[uncompressedOffset], &actualUncompressedSize, &compressedData[0], compressedSize);
+					if (!checkZlibResult(result))
+						return 1;
+				}
+				else
+				{
+					ReadData(moduleFile, block.uncompressedSize, &uncompressedData[uncompressedOffset]);
+				}
 			}
 		}
 		else
 		{
 			// decompress using totalUncompressedSize and totalCompressedSize
 			auto compressedSize = file.totalCompressedSize;
-			auto compressedData = std::make_unique<uint8_t[]>(compressedSize);
-			moduleFile.seekg(compressedDataStart + file.compressedOffset, std::ios::beg);
-			ReadData(moduleFile, compressedSize, &compressedData[0]);
-
 			uncompressedData = std::make_unique<uint8_t[]>(uncompressedSize);
-			auto result = uncompress(&uncompressedData[0], &uncompressedSize, &compressedData[0], compressedSize);
-			if (!checkZlibResult(result))
-				return 1;
+			moduleFile.seekg(compressedDataStart + file.compressedOffset, std::ios::beg);
+			if (compressedSize != uncompressedSize)
+			{
+				auto compressedData = std::make_unique<uint8_t[]>(compressedSize);
+				ReadData(moduleFile, compressedSize, &compressedData[0]);
+				auto result = uncompress(&uncompressedData[0], &uncompressedSize, &compressedData[0], compressedSize);
+				if (!checkZlibResult(result))
+					return 1;
+			}
+			else
+			{
+				ReadData(moduleFile, uncompressedSize, &uncompressedData[0]);
+			}
 		}
 
 		try

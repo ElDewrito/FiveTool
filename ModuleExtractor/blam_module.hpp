@@ -55,12 +55,12 @@ EXPECT_SIZE(BlamModuleFile, 0x58);
 
 struct BlamModuleCompressedBlock
 {
-	uint64_t unknown0;
+	uint64_t checksum; // MurmurHash3_128 of uncompressed data (only the lower 64 bits are used)
 	uint32_t compressedOffset; // relative to the file's compressedOffset
 	uint32_t compressedSize;
 	uint32_t uncompressedOffset; // offset in the result buffer to put the data
 	uint32_t uncompressedSize;
-	int unknown18;
-	int unknown1C;
+	bool compressed;
+	int padding1C;
 };
 EXPECT_SIZE(BlamModuleCompressedBlock, 0x20);
