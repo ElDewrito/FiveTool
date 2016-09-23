@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 		displayError("Failed to open " + modulePath.string() + " for reading");
 		return 1;
 	}
-	filesystem::create_directory(outputDir);
+	CreateDirectories(outputDir);
 
 	std::cout << "Reading header..." << std::endl;
 
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 		try
 		{
 			auto tagPath = SanitizeFileName(outputDir / name);
-			filesystem::create_directories(tagPath.parent_path());
+			CreateDirectories(tagPath.parent_path());
 			if (!WriteData(&uncompressedData[0], uncompressedSize, tagPath))
 			{
 				displayError("Failed to open the output file");

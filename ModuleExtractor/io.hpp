@@ -32,3 +32,7 @@ void WriteArray(const T values[], size_t count, const std::experimental::filesys
 }
 
 std::experimental::filesystem::path SanitizeFileName(const std::experimental::filesystem::path& path);
+
+std::experimental::filesystem::path MakeLongPath(const std::experimental::filesystem::path& path);
+
+void CreateDirectories(const std::experimental::filesystem::path& path);
