@@ -17,7 +17,7 @@ void ReadArray(std::ifstream& stream, size_t count, T out[])
 	ReadData(stream, sizeof(T) * count, reinterpret_cast<uint8_t*>(out));
 }
 
-void WriteData(const uint8_t* data, int64_t size, const std::experimental::filesystem::path& path);
+bool WriteData(const uint8_t* data, int64_t size, const std::experimental::filesystem::path& path);
 
 template<typename T>
 void WriteStruct(const T& value, const std::experimental::filesystem::path& path)

@@ -143,7 +143,11 @@ int main(int argc, char *argv[])
 		{
 			auto tagPath = SanitizeFileName(outputDir / name);
 			filesystem::create_directories(tagPath.parent_path());
-			WriteData(&uncompressedData[0], uncompressedSize, tagPath);
+			if (!WriteData(&uncompressedData[0], uncompressedSize, tagPath))
+			{
+				displayError("Failed to open the output file");
+				return 1;
+			}
 		}
 		catch (const std::exception& e)
 		{
