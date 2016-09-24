@@ -18,9 +18,9 @@ namespace FiveLib.Ausar.Module.Structures
 
         public int UnknownC { get; set; }
 
-        public int CompressedBlockCount { get; set; }
+        public int BlockCount { get; set; }
 
-        public int FirstCompressedBlockIndex { get; set; }
+        public int FirstBlockIndex { get; set; }
 
         public ulong CompressedOffset { get; set; }
 
@@ -62,8 +62,8 @@ namespace FiveLib.Ausar.Module.Structures
             ParentFileIndex = reader.ReadInt32();
             Unknown8 = reader.ReadInt32();
             UnknownC = reader.ReadInt32();
-            CompressedBlockCount = reader.ReadInt32();
-            FirstCompressedBlockIndex = reader.ReadInt32();
+            BlockCount = reader.ReadInt32();
+            FirstBlockIndex = reader.ReadInt32();
             CompressedOffset = reader.ReadUInt64();
             TotalCompressedSize = reader.ReadUInt32();
             TotalUncompressedSize = reader.ReadUInt32();
@@ -89,8 +89,8 @@ namespace FiveLib.Ausar.Module.Structures
             writer.Write(ParentFileIndex);
             writer.Write(Unknown8);
             writer.Write(UnknownC);
-            writer.Write(CompressedBlockCount);
-            writer.Write(FirstCompressedBlockIndex);
+            writer.Write(BlockCount);
+            writer.Write(FirstBlockIndex);
             writer.Write(CompressedOffset);
             writer.Write(TotalCompressedSize);
             writer.Write(TotalUncompressedSize);

@@ -9,7 +9,7 @@ namespace FiveLib.Ausar.Module
 {
     public class ModuleEntryBlock
     {
-        public long Unknown0 { get; }
+        public ulong Checksum { get; }
 
         public uint CompressedOffset { get; }
 
@@ -19,19 +19,16 @@ namespace FiveLib.Ausar.Module
 
         public uint UncompressedSize { get; }
 
-        public int Unknown18 { get; }
+        public bool IsCompressed { get; }
 
-        public int Unknown1C { get; }
-
-        internal ModuleEntryBlock(ModuleCompressedBlockStruct data)
+        internal ModuleEntryBlock(ModuleEntryBlockStruct data)
         {
-            Unknown0 = data.Unknown0;
+            Checksum = data.Checksum;
             CompressedOffset = data.CompressedOffset;
             CompressedSize = data.CompressedSize;
             UncompressedOffset = data.UncompressedOffset;
             UncompressedSize = data.UncompressedSize;
-            Unknown18 = data.Unknown18;
-            Unknown1C = data.Unknown1C;
+            IsCompressed = data.IsCompressed;
         }
     }
 }

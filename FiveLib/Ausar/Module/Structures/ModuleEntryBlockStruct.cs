@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace FiveLib.Ausar.Module.Structures
 {
-    internal class ModuleCompressedBlockStruct
+    internal class ModuleEntryBlockStruct
     {
-        public long Unknown0 { get; set; }
+        // MurmurHash3_128 of the uncompressed block
+        public ulong Checksum { get; set; }
 
         public uint CompressedOffset { get; set; }
 
@@ -19,30 +20,28 @@ namespace FiveLib.Ausar.Module.Structures
 
         public uint UncompressedSize { get; set; }
 
-        public int Unknown18 { get; set; }
-
-        public int Unknown1C { get; set; } 
+        public bool IsCompressed { get; set; }
 
         public void Read(BinaryReader reader)
         {
-            Unknown0 = reader.ReadInt64();
+            Checksum = reader.ReadUInt64();
             CompressedOffset = reader.ReadUInt32();
             CompressedSize = reader.ReadUInt32();
             UncompressedOffset = reader.ReadUInt32();
             UncompressedSize = reader.ReadUInt32();
-            Unknown18 = reader.ReadInt32();
-            Unknown1C = reader.ReadInt32();
+            IsCompressed = reader.ReadInt32() != 0;
+            reader.BaseStream.Position += 4; // Padding
         }
 
         public void Write(BinaryWriter writer)
         {
-            writer.Write(Unknown0);
+            writer.Write(Checksum);
             writer.Write(CompressedOffset);
             writer.Write(CompressedSize);
             writer.Write(UncompressedOffset);
             writer.Write(UncompressedSize);
-            writer.Write(Unknown18);
-            writer.Write(Unknown1C);
+            writer.Write(IsCompressed ? 1 : 0);
+            writer.Write(0); // Padding
         }
     }
 }

@@ -30,8 +30,8 @@ namespace FiveLib.Tests.Ausar.Module.Structures
             Assert.AreEqual(2, entry.ParentFileIndex);
             Assert.AreEqual(3, entry.Unknown8);
             Assert.AreEqual(4, entry.UnknownC);
-            Assert.AreEqual(5, entry.CompressedBlockCount);
-            Assert.AreEqual(6, entry.FirstCompressedBlockIndex);
+            Assert.AreEqual(5, entry.BlockCount);
+            Assert.AreEqual(6, entry.FirstBlockIndex);
             Assert.AreEqual(7U, entry.CompressedOffset);
             Assert.AreEqual(8U, entry.TotalCompressedSize);
             Assert.AreEqual(9U, entry.TotalUncompressedSize);
@@ -60,8 +60,8 @@ namespace FiveLib.Tests.Ausar.Module.Structures
                 ParentFileIndex = 2,
                 Unknown8 = 3,
                 UnknownC = 4,
-                CompressedBlockCount = 5,
-                FirstCompressedBlockIndex = 6,
+                BlockCount = 5,
+                FirstBlockIndex = 6,
                 CompressedOffset = 7,
                 TotalCompressedSize = 8,
                 TotalUncompressedSize = 9,

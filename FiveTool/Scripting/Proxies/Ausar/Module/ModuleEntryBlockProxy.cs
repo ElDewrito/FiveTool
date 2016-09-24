@@ -19,7 +19,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             _block = block;
         }
 
-        public long Unknown0 => _block.Unknown0;
+        public ulong Checksum => _block.Checksum;
 
         public uint CompressedOffset => _block.CompressedOffset;
 
@@ -29,9 +29,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public uint UncompressedSize => _block.UncompressedSize;
 
-        public int Unknown18 => _block.Unknown18;
-
-        public int Unknown1C => _block.Unknown1C;
+        public bool IsCompressed => _block.IsCompressed;
 
         public override string ToString() => "(ModuleEntryBlock)";
     }

@@ -33,7 +33,9 @@ namespace FiveLib.Ausar.Module.Structures
 
         public int CompressedBlockCount { get; set; }
 
-        public byte[] Unknown28 { get; } = new byte[0x10];
+        public ulong Unknown28 { get; set; }
+
+        public ulong HeaderChecksum { get; set; }
 
         public void Read(BinaryReader reader)
         {
@@ -47,7 +49,8 @@ namespace FiveLib.Ausar.Module.Structures
             StringTableSize = reader.ReadUInt32();
             ResourceCount = reader.ReadInt32();
             CompressedBlockCount = reader.ReadInt32();
-            reader.Read(Unknown28, 0, Unknown28.Length);
+            Unknown28 = reader.ReadUInt64();
+            HeaderChecksum = reader.ReadUInt64();
         }
 
         public void Write(BinaryWriter writer)
@@ -63,6 +66,7 @@ namespace FiveLib.Ausar.Module.Structures
             writer.Write(ResourceCount);
             writer.Write(CompressedBlockCount);
             writer.Write(Unknown28);
+            writer.Write(HeaderChecksum);
         }
     }
 }

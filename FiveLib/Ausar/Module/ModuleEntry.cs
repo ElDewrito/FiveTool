@@ -87,10 +87,10 @@ namespace FiveLib.Ausar.Module
 
         private static List<ModuleEntryBlock> GetBlockList(ModuleEntryStruct data, ModuleStruct module)
         {
-            var blocks = new List<ModuleEntryBlock>(data.CompressedBlockCount);
-            for (var i = 0; i < data.CompressedBlockCount; i++)
+            var blocks = new List<ModuleEntryBlock>(data.BlockCount);
+            for (var i = 0; i < data.BlockCount; i++)
             {
-                var block = module.CompressedBlocks[data.FirstCompressedBlockIndex + i];
+                var block = module.CompressedBlocks[data.FirstBlockIndex + i];
                 blocks.Add(new ModuleEntryBlock(block));
             }
             return blocks;

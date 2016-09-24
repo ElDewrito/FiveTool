@@ -10,42 +10,43 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FiveLib.Tests.Ausar.Module.Structures
 {
     [TestClass]
-    public class ModuleCompressedBlockStructTests
+    public class ModuleEntryBlockStructTests
     {
         private static readonly byte[] DummyBlockBytes =
         {
             0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-            0x04, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00,
+            0x04, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         };
 
         [TestMethod]
         public void TestReadingDummyCompressedBlock()
         {
-            var block = new ModuleCompressedBlockStruct();
+            var block = new ModuleEntryBlockStruct();
             using (var reader = new BinaryReader(new MemoryStream(DummyBlockBytes)))
+            {
                 block.Read(reader);
+                Assert.AreEqual(DummyBlockBytes.Length, reader.BaseStream.Position);
+            }
 
-            Assert.AreEqual(1, block.Unknown0);
+            Assert.AreEqual(1U, block.Checksum);
             Assert.AreEqual(2U, block.CompressedOffset);
             Assert.AreEqual(3U, block.CompressedSize);
             Assert.AreEqual(4U, block.UncompressedOffset);
             Assert.AreEqual(5U, block.UncompressedSize);
-            Assert.AreEqual(6, block.Unknown18);
-            Assert.AreEqual(7, block.Unknown1C);
+            Assert.AreEqual(true, block.IsCompressed);
         }
 
         [TestMethod]
         public void TestWritingDummyCompressedBlock()
         {
-            var block = new ModuleCompressedBlockStruct
+            var block = new ModuleEntryBlockStruct
             {
-                Unknown0 = 1,
+                Checksum = 1,
                 CompressedOffset = 2,
                 CompressedSize = 3,
                 UncompressedOffset = 4,
                 UncompressedSize = 5,
-                Unknown18 = 6,
-                Unknown1C = 7,
+                IsCompressed = true,
             };
 
             byte[] writtenBytes;
