@@ -60,6 +60,7 @@
     <Compile Include="Scripting\BuiltIns\DumpBuiltIns.cs" />
     <Compile Include="Scripting\BuiltIns\IoBuiltIns.cs" />
     <Compile Include="Scripting\Platform\FileAccessUtil.cs" />
+    <Compile Include="Scripting\Platform\FiveToolPlatformAccessor.cs" />
     <Compile Include="Scripting\Platform\PathUtil.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\AusarModuleProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryBlockProxy.cs" />

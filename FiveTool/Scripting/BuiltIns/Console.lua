@@ -19,3 +19,6 @@ DefineHelp ("Core", "Dump", {
 		"Dump(FindModuleEntry(\"storm_assault_rifle.weapon\"))",
 	},
 });
+
+-- Disable buffering on stdout to make things easier
+io.output():setvbuf("no")

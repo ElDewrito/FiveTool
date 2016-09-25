@@ -5,10 +5,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Module;
-using FiveLib.Ausar.Tags;
 using FiveTool.Scripting.BuiltIns;
+using FiveTool.Scripting.Platform;
 using FiveTool.Scripting.Proxies.Ausar.Module;
-using FiveTool.Scripting.Proxies.Ausar.Tags;
 using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting
@@ -32,11 +31,12 @@ namespace FiveTool.Scripting
             UserData.RegisterProxyType<AusarModuleProxy, AusarModule>(r => new AusarModuleProxy(r));
             UserData.RegisterProxyType<ModuleEntryProxy, ModuleEntry>(r => new ModuleEntryProxy(r));
             UserData.RegisterProxyType<ModuleEntryBlockProxy, ModuleEntryBlock>(r => new ModuleEntryBlockProxy(r));
+            Script.GlobalOptions.Platform = new FiveToolPlatformAccessor();
         }
 
         public static Script CreateScript()
         {
-            var script = new Script(CoreModules.Preset_SoftSandbox);
+            var script = new Script();
 
             script.Globals["AusarModule"] = UserData.CreateStatic(typeof(AusarModuleProxy));
 
