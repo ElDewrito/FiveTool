@@ -68,6 +68,54 @@ DefineHelp("File", "ChooseNewFile", {
 	},
 })
 
+function ChooseFolder(message)
+	if message == nil then
+		message = "Select a folder."
+	end
+	return Dialog.OpenFolder({
+		message = message,
+		allowCreate = false,
+	})
+end
+
+DefineHelp("File", "ChooseFolder", {
+	shortDescription = "Browse for a folder",
+	longDescription = "Shows a dialog asking the user to browse for a folder.\nThis will grant the script access to every file and subfolder of the folder.",
+	args = {
+		{ "message", "(Optional) The message to display in the dialog" },
+	},
+	returns = "A unique path token that refers to the directory, or nil if the user canceled. By appending to the returned string, you can create paths for files in the folder.",
+	examples = {
+		"ChooseFolder()",
+		"ChooseFolder(\"Select the folder containing the tags to import.\")",
+		"io.open(ChooseFolder() .. \"data.txt\")",
+	},
+})
+
+function ChooseNewFolder(message)
+	if message == nil then
+		message = "Select a folder."
+	end
+	return Dialog.OpenFolder({
+		message = message,
+		allowCreate = true,
+	})
+end
+
+DefineHelp("File", "ChooseNewFolder", {
+	shortDescription = "Browse for a folder which can be created",
+	longDescription = "Shows a dialog asking the user to browse for a folder.\nThere will be an option for the user to create a new folder.\nThis will grant the script access to every file and subfolder of the folder.",
+	args = {
+		{ "message", "(Optional) The message to display in the dialog" },
+	},
+	returns = "A unique path token that refers to the directory, or nil if the user canceled. By appending to the returned string, you can create paths for files in the folder.",
+	examples = {
+		"ChooseNewFolder()",
+		"ChooseNewFolder(\"Select the folder to save extracted files to.\")",
+		"io.open(ChooseNewFolder() .. \"out.txt\", \"w\")",
+	},
+})
+
 BuildFilterList = function(extension)
 	local filters = {
 		{ "All Files", "*.*" },

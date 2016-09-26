@@ -16,6 +16,7 @@ namespace FiveTool.Scripting.BuiltIns
             var dialog = new Table(script)
             {
                 ["OpenFile"] = DynValue.NewCallback(OpenFile, nameof(OpenFile)),
+                ["OpenFolder"] = DynValue.NewCallback(OpenFolder, nameof(OpenFolder)),
                 ["OpenGameFolder"] = (Func<bool>)OpenGameFolder,
             };
             script.Globals["Dialog"] = dialog;
@@ -23,7 +24,7 @@ namespace FiveTool.Scripting.BuiltIns
 
         private static DynValue OpenFile(ScriptExecutionContext context, CallbackArguments args)
         {
-            var options = args.AsType(0, "OpenFile", DataType.Table).Table;
+            var options = args.AsType(0, nameof(OpenFile), DataType.Table).Table;
             var type = options.Get("type").CastToString();
             var title = options.Get("title").CastToString();
             var filter = ParseFiltersTable(options.Get("filters"));
@@ -46,6 +47,26 @@ namespace FiveTool.Scripting.BuiltIns
             if (!accepted)
                 return DynValue.Nil;
             var token = PathToken.Generate(selectedFile);
+            return DynValue.NewString(token);
+        }
+
+        private static DynValue OpenFolder(ScriptExecutionContext context, CallbackArguments args)
+        {
+            var options = args.AsType(0, nameof(OpenFolder), DataType.Table).Table;
+            var message = options.Get("message").CastToString();
+            var allowCreate = options.Get("allowCreate").CastToBool();
+
+            string selectedPath;
+            while (true)
+            {
+                if (!Dialogs.OpenFolder(message, allowCreate, out selectedPath))
+                    return DynValue.Nil;
+                if (
+                    Dialogs.YesNoQuestion(
+                        $"You are about to give the script access to every file and folder in {selectedPath}.\n\nMalicious scripts could use this to harm your computer. Continue?"))
+                    break;
+            }
+            var token = PathToken.Generate(selectedPath);
             return DynValue.NewString(token);
         }
 

@@ -13,6 +13,26 @@ namespace FiveTool.Scripting.Platform
         private const string DialogTitle = "FiveTool";
 
         /// <summary>
+        /// Asks the user a yes/no question.
+        /// </summary>
+        /// <param name="question">The question.</param>
+        /// <returns><c>true</c> if the user answered "yes".</returns>
+        public static bool YesNoQuestion(string question)
+        {
+            return MessageBox.Show(question, DialogTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
+                   DialogResult.Yes;
+        }
+
+        /// <summary>
+        /// Displays an error message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        public static void Error(string message)
+        {
+            MessageBox.Show(message, DialogTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+        }
+
+        /// <summary>
         /// Asks the user to open an existing file.
         /// </summary>
         /// <param name="title">The dialog title.</param>
@@ -59,6 +79,27 @@ namespace FiveTool.Scripting.Platform
         }
 
         /// <summary>
+        /// Asks the user to open a folder.
+        /// </summary>
+        /// <param name="message">The message to display.</param>
+        /// <param name="allowCreate">If set to <c>true</c>, allows the user to create a new folder.</param>
+        /// <param name="path">The variable to hold the absolute path.</param>
+        /// <returns><c>true</c> if a folder was selected.</returns>
+        public static bool OpenFolder(string message, bool allowCreate, out string path)
+        {
+            path = null;
+            var dialog = new FolderBrowserDialog
+            {
+                Description = message,
+                ShowNewFolderButton = allowCreate,
+            };
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return false;
+            path = Path.GetFullPath(dialog.SelectedPath);
+            return true;
+        }
+
+        /// <summary>
         /// Asks the user to browse for a new game folder.
         /// </summary>
         /// <returns><c>true</c> if a folder was selected.</returns>
@@ -66,21 +107,15 @@ namespace FiveTool.Scripting.Platform
         {
             while (true)
             {
-                // TODO: Decouple this from winforms...
-                var dialog = new FolderBrowserDialog
-                {
-                    Description = "Select the folder where you dumped the Halo 5: Forge files.",
-                    ShowNewFolderButton = false,
-                };
-                if (dialog.ShowDialog() != DialogResult.OK)
+                string folder;
+                if (!OpenFolder("Select the folder where you dumped the Halo 5: Forge files.", false, out folder))
                     return false;
-                var folder = dialog.SelectedPath;
                 var exePath = Path.Combine(folder, "halo5forge.exe");
                 if (!File.Exists(Path.Combine(folder, "halo5forge.exe")))
                 {
                     if (
-                        MessageBox.Show("The folder you selected does not look like a valid Halo 5: Forge install. Use it anyways?",
-                            DialogTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        !YesNoQuestion(
+                            "The folder you selected does not look like a valid Halo 5: Forge install. Use it anyways?"))
                         continue;
                 }
                 try
@@ -90,9 +125,8 @@ namespace FiveTool.Scripting.Platform
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show(
-                        "You do not have read access to the files in that folder.\nYou must dump the game files first before using FiveTool.",
-                        DialogTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Error(
+                        "You do not have read access to the files in that folder.\nYou must dump the game files first before using FiveTool.");
                     continue;
                 }
                 Config.Current.GameRoot = folder;
