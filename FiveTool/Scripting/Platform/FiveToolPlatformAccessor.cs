@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,29 @@ namespace FiveTool.Scripting.Platform
 {
     internal class FiveToolPlatformAccessor : PlatformAccessorBase
     {
+        private const string TempFileDirName = "FiveTool";
+
+        private readonly TempFileCollection _tempFiles = new TempFileCollection();
+
+        /// <summary>
+        /// Removes any temporary files created by scripts.
+        /// </summary>
+        public static void ClearTempFiles()
+        {
+            try
+            {
+                var path = Path.Combine(Path.GetTempPath(), TempFileDirName);
+                if (Directory.Exists(path))
+                    Directory.Delete(path, true);
+            }
+            catch
+            {
+#if DEBUG
+                throw;
+#endif
+            }
+        }
+
         public override string GetPlatformNamePrefix()
         {
             return "FiveTool";
@@ -52,8 +76,13 @@ namespace FiveTool.Scripting.Platform
 
         public override string IO_OS_GetTempFilename()
         {
-            // TODO: Find a good way to implement this
-            throw new ScriptRuntimeException("Temporary files are not supported");
+            var dir = Path.Combine(Path.GetTempPath(), TempFileDirName);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            var fileName = Path.Combine(dir, Path.GetRandomFileName());
+            File.Create(fileName).Dispose();
+            _tempFiles.AddFile(fileName, false);
+            return PathToken.Generate(fileName);
         }
 
         public override void OS_ExitFast(int exitCode)

@@ -32,6 +32,7 @@ namespace FiveTool.Scripting
             UserData.RegisterProxyType<ModuleEntryProxy, ModuleEntry>(r => new ModuleEntryProxy(r));
             UserData.RegisterProxyType<ModuleEntryBlockProxy, ModuleEntryBlock>(r => new ModuleEntryBlockProxy(r));
             Script.GlobalOptions.Platform = new FiveToolPlatformAccessor();
+            FiveToolPlatformAccessor.ClearTempFiles();
         }
 
         public static Script CreateScript()
