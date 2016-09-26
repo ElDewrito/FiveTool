@@ -1,6 +1,12 @@
 ﻿local loadedModules = {} -- Modules keyed by path
 
 function LoadModule (path)
+	if path == nil then
+		path = ChooseFile("module", "Open Module File")
+		if path == nil then
+			return nil
+		end
+	end
 	if loadedModules[path] == nil then
 		loadedModules[path] = AusarModule.LoadFromFile(path)
 	end
@@ -9,11 +15,11 @@ end
 
 DefineHelp ("Module", "LoadModule", {
 	shortDescription = "Load a module file",
-	longDescription = "Loads a module file.\nIts contents will be made accessible to other functions.",
+	longDescription = "Loads a module file.\nIts contents will be made accessible to other functions.\nIf a path is not provided, the user will be asked to browse for one.",
 	args = {
-		{ "path", "The path to the module file to load" },
+		{ "path", "(Optional) The path to the module file to load" },
 	},
-	returns = "The loaded module object.",
+	returns = "The loaded module object, or nil if no path was given and the user cancelled.",
 	examples = {
 		"LoadModule([[deploy\\any\\levels\\globals-rtx-1.module]])",
 	},
