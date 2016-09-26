@@ -5,48 +5,57 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting.Platform
 {
-    internal static class FileAccessUtil
+    internal static class Dialogs
     {
         private const string DialogTitle = "FiveTool";
 
         /// <summary>
-        /// Gets the absolute path of a file, throwing a <see cref="ScriptRuntimeException"/> if it is not accessible.
+        /// Asks the user to open an existing file.
         /// </summary>
-        /// <param name="relativePath">The relative path to the file.</param>
-        /// <returns>The absolute path.</returns>
-        public static string ResolvePath(string relativePath)
+        /// <param name="title">The dialog title.</param>
+        /// <param name="filter">The filter string to use.</param>
+        /// <param name="path">The variable to hold the absolute path.</param>
+        /// <returns><c>true</c> if a file was selected.</returns>
+        public static bool OpenFile(string title, string filter, out string path)
         {
-            string absolutePath;
-            if (!TryResolvePath(relativePath, out absolutePath))
-                throw new ScriptRuntimeException($"File \"{relativePath}\" is not accessible");
-            return absolutePath;
+            path = null;
+            var dialog = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Filter = filter,
+                Title = title,
+            };
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return false;
+            path = Path.GetFullPath(dialog.FileName);
+            return true;
         }
 
         /// <summary>
-        /// Gets the absolute path of a file if it is accessible.
+        /// Asks the user to save a file.
         /// </summary>
-        /// <param name="relativePath">The relative path to the file.</param>
-        /// <param name="result">The variable which will hold the absolute path.</param>
-        /// <returns><c>true</c> if the file is accessible.</returns>
-        public static bool TryResolvePath(string relativePath, out string result)
+        /// <param name="title">The dialog title.</param>
+        /// <param name="filter">The filter string to use.</param>
+        /// <param name="suggestedName">The suggested filename to use.</param>
+        /// <param name="path">The variable to hold the absolute path.</param>
+        /// <returns><c>true</c> if a file was selected.</returns>
+        public static bool SaveFile(string title, string filter, string suggestedName, out string path)
         {
-            result = null;
-            try
+            path = null;
+            var dialog = new SaveFileDialog
             {
-                string simplifiedPath;
-                if (!PathUtil.SimplifyRelativePath(relativePath, out simplifiedPath))
-                    return false;
-                result = Path.Combine(Config.Current.GameRoot, simplifiedPath);
-                return true;
-            }
-            catch
-            {
+                FileName = suggestedName,
+                Filter = filter,
+                Title = title,
+            };
+            if (dialog.ShowDialog() != DialogResult.OK)
                 return false;
-            }
+            path = Path.GetFullPath(dialog.FileName);
+            return true;
         }
 
         /// <summary>

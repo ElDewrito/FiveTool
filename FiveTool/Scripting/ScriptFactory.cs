@@ -21,7 +21,7 @@ namespace FiveTool.Scripting
             "Help.lua", // Must be run first
             "Console.lua",
             "DataTypes.lua",
-            "Io.lua",
+            "Dialogs.lua",
             "Modules.lua",
         };
 
@@ -47,7 +47,7 @@ namespace FiveTool.Scripting
         private static void RegisterBuiltIns(Script script)
         {
             DataTypeBuiltIns.Register(script);
-            IoBuiltIns.Register(script);
+            DialogBuiltIns.Register(script);
             ConsoleBuiltIns.Register(script);
             DumpBuiltIns.Register(script);
 

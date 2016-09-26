@@ -30,7 +30,7 @@ namespace FiveTool.Scripting.Platform
 
         public override Stream IO_OpenFile(Script script, string filename, Encoding encoding, string mode)
         {
-            filename = FileAccessUtil.ResolvePath(filename);
+            filename = FileSandbox.ResolvePath(filename);
             var openMode = ParseFileMode(mode);
             return File.Open(filename, openMode.Mode, openMode.Access);
         }
@@ -63,19 +63,19 @@ namespace FiveTool.Scripting.Platform
 
         public override bool OS_FileExists(string file)
         {
-            return FileAccessUtil.TryResolvePath(file, out file) && File.Exists(file);
+            return FileSandbox.TryResolvePath(file, out file) && File.Exists(file);
         }
 
         public override void OS_FileDelete(string file)
         {
-            file = FileAccessUtil.ResolvePath(file);
+            file = FileSandbox.ResolvePath(file);
             File.Delete(file);
         }
 
         public override void OS_FileMove(string src, string dst)
         {
-            src = FileAccessUtil.ResolvePath(src);
-            dst = FileAccessUtil.ResolvePath(dst);
+            src = FileSandbox.ResolvePath(src);
+            dst = FileSandbox.ResolvePath(dst);
             File.Move(src, dst);
         }
 

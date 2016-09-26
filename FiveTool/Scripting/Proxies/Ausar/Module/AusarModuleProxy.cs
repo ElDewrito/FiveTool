@@ -51,7 +51,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public static AusarModuleProxy LoadFromFile(string path)
         {
-            path = FileAccessUtil.ResolvePath(path);
+            path = FileSandbox.ResolvePath(path);
             var stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
             var module = AusarModule.Open(stream);
             return new AusarModuleProxy(module, stream);

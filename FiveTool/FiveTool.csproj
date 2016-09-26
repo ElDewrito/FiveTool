@@ -58,9 +58,11 @@
     <Compile Include="Scripting\BuiltIns\ConsoleBuiltIns.cs" />
     <Compile Include="Scripting\BuiltIns\DataTypeBuiltIns.cs" />
     <Compile Include="Scripting\BuiltIns\DumpBuiltIns.cs" />
-    <Compile Include="Scripting\BuiltIns\IoBuiltIns.cs" />
-    <Compile Include="Scripting\Platform\FileAccessUtil.cs" />
+    <Compile Include="Scripting\BuiltIns\DialogBuiltIns.cs" />
+    <Compile Include="Scripting\Platform\Dialogs.cs" />
+    <Compile Include="Scripting\Platform\FileSandbox.cs" />
     <Compile Include="Scripting\Platform\FiveToolPlatformAccessor.cs" />
+    <Compile Include="Scripting\Platform\PathToken.cs" />
     <Compile Include="Scripting\Platform\PathUtil.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\AusarModuleProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryBlockProxy.cs" />
@@ -77,7 +79,7 @@
     <EmbeddedResource Include="Scripting\BuiltIns\Help.lua" />
     <EmbeddedResource Include="Scripting\BuiltIns\Console.lua" />
     <EmbeddedResource Include="Scripting\BuiltIns\DataTypes.lua" />
-    <EmbeddedResource Include="Scripting\BuiltIns\Io.lua" />
+    <EmbeddedResource Include="Scripting\BuiltIns\Dialogs.lua" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FiveLib\FiveLib.csproj">

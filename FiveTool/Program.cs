@@ -168,7 +168,7 @@ namespace FiveTool
             if (string.IsNullOrWhiteSpace(Config.Current.GameRoot) || !Directory.Exists(Config.Current.GameRoot))
             {
                 Console.Error.WriteLine("Halo 5: Forge root folder is invalid or not set. Please select a new one.");
-                if (!FileAccessUtil.ChooseGameFolder())
+                if (!Dialogs.ChooseGameFolder())
                     return false;
             }
             return true;

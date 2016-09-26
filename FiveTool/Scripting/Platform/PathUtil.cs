@@ -36,7 +36,7 @@ namespace FiveTool.Scripting.Platform
                         return false;
                     outComponentCount--;
                 }
-                else if (component != ".")
+                else if (component != "." && !string.IsNullOrEmpty(component))
                 {
                     // Add a component to the end
                     outComponents[outComponentCount] = component;
