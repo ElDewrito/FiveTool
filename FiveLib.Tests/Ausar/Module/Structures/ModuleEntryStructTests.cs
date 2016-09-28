@@ -32,7 +32,7 @@ namespace FiveLib.Tests.Ausar.Module.Structures
             Assert.AreEqual(4, entry.UnknownC);
             Assert.AreEqual(5, entry.BlockCount);
             Assert.AreEqual(6, entry.FirstBlockIndex);
-            Assert.AreEqual(7U, entry.CompressedOffset);
+            Assert.AreEqual(7, entry.CompressedOffset);
             Assert.AreEqual(8U, entry.TotalCompressedSize);
             Assert.AreEqual(9U, entry.TotalUncompressedSize);
             Assert.AreEqual(10, entry.Unknown28);

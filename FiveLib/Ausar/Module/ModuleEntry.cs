@@ -25,7 +25,7 @@ namespace FiveLib.Ausar.Module
 
         public IList<ModuleEntryBlock> Blocks { get; }
 
-        public ulong CompressedOffset { get; }
+        public long CompressedOffset { get; }
 
         public uint TotalCompressedSize { get; }
 
@@ -88,10 +88,27 @@ namespace FiveLib.Ausar.Module
         private static List<ModuleEntryBlock> GetBlockList(ModuleEntryStruct data, ModuleStruct module)
         {
             var blocks = new List<ModuleEntryBlock>(data.BlockCount);
-            for (var i = 0; i < data.BlockCount; i++)
+            if (data.BlockCount > 0)
             {
-                var block = module.CompressedBlocks[data.FirstBlockIndex + i];
-                blocks.Add(new ModuleEntryBlock(block));
+                for (var i = 0; i < data.BlockCount; i++)
+                {
+                    var block = module.CompressedBlocks[data.FirstBlockIndex + i];
+                    blocks.Add(new ModuleEntryBlock(block));
+                }
+            }
+            else
+            {
+                // If an entry has 0 blocks, then make one
+                var blockStruct = new ModuleEntryBlockStruct
+                {
+                    Checksum = 0, // TODO: There's probably an entry checksum field
+                    CompressedOffset = 0,
+                    CompressedSize = data.TotalCompressedSize,
+                    IsCompressed = data.TotalCompressedSize == data.TotalUncompressedSize,
+                    UncompressedOffset = 0,
+                    UncompressedSize = data.TotalUncompressedSize,
+                };
+                blocks.Add(new ModuleEntryBlock(blockStruct));
             }
             return blocks;
         } 

@@ -29,7 +29,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public ListProxy<ModuleEntryBlock> Blocks => new ListProxy<ModuleEntryBlock>(_entry.Blocks);
 
-        public ulong CompressedOffset => _entry.CompressedOffset;
+        public long CompressedOffset => _entry.CompressedOffset;
 
         public uint TotalCompressedSize => _entry.TotalCompressedSize;
 

@@ -22,7 +22,7 @@ namespace FiveLib.Ausar.Module.Structures
 
         public int FirstBlockIndex { get; set; }
 
-        public ulong CompressedOffset { get; set; }
+        public long CompressedOffset { get; set; }
 
         public uint TotalCompressedSize { get; set; }
 
@@ -64,7 +64,7 @@ namespace FiveLib.Ausar.Module.Structures
             UnknownC = reader.ReadInt32();
             BlockCount = reader.ReadInt32();
             FirstBlockIndex = reader.ReadInt32();
-            CompressedOffset = reader.ReadUInt64();
+            CompressedOffset = reader.ReadInt64();
             TotalCompressedSize = reader.ReadUInt32();
             TotalUncompressedSize = reader.ReadUInt32();
             Unknown28 = reader.ReadByte();

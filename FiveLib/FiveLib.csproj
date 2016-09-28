@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MurmurHash, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\murmurhash.1.0.0\lib\net45\MurmurHash.dll</HintPath>
       <Private>True</Private>
@@ -45,13 +49,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ausar\Module\AusarModule.cs" />
+    <Compile Include="Ausar\Module\ModuleBlockCompressor.cs" />
     <Compile Include="Ausar\Module\ModuleEntry.cs" />
     <Compile Include="Ausar\Module\ModuleEntryBlock.cs" />
+    <Compile Include="Ausar\Module\ModuleBlockStream.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleEntryBlockStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleEntryStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleFileHeaderStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleStruct.cs" />
     <Compile Include="Ausar\Tags\StringId.cs" />
+    <Compile Include="Common\BinarySearch.cs" />
     <Compile Include="Common\StreamUtil.cs" />
     <Compile Include="Common\MagicNumber.cs" />
     <Compile Include="Common\StringBlob.cs" />

@@ -17,6 +17,7 @@ namespace FiveLib.Ausar.Module
     public class AusarModule
     {
         private readonly Stream _stream;
+        private readonly ModuleBlockCompressor _blockCompressor;
         private readonly List<ModuleEntry> _entries = new List<ModuleEntry>();
         private readonly List<ModuleEntry> _resources = new List<ModuleEntry>();
 
@@ -27,6 +28,7 @@ namespace FiveLib.Ausar.Module
         {
             _stream = stream;
             DataBaseOffset = stream.Position;
+            _blockCompressor = new ModuleBlockCompressor(_stream, DataBaseOffset);
 
             _entries.AddRange(entries);
             _resources.AddRange(resources);
@@ -76,6 +78,41 @@ namespace FiveLib.Ausar.Module
         public bool GetEntryByGlobalTagId(int id, out ModuleEntry entry)
         {
             return _entriesByGlobalTagId.TryGetValue(id, out entry);
+        }
+
+        /// <summary>
+        /// Opens a stream on an entry.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <returns>A stream which can be used to read the entry data.</returns>
+        public ModuleBlockStream OpenEntry(ModuleEntry entry)
+        {
+            return new ModuleBlockStream(_blockCompressor, entry);
+        }
+
+        /// <summary>
+        /// Extracts an entire entry to a stream.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <param name="outStream">The stream to extract to.</param>
+        public void ExtractEntry(ModuleEntry entry, Stream outStream)
+        {
+            using (var entryStream = OpenEntry(entry))
+                entryStream.CopyTo(outStream);
+        }
+
+        /// <summary>
+        /// Extracts an entry to a file. All directories in the path will be created.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <param name="filePath">The path of the output file to create.</param>
+        public void ExtractEntry(ModuleEntry entry, string filePath)
+        {
+            var directories = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directories))
+                Directory.CreateDirectory(directories);
+            using (var fileStream = File.Create(filePath))
+                ExtractEntry(entry, fileStream);
         }
 
         /// <summary>
