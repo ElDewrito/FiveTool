@@ -104,7 +104,7 @@ namespace FiveLib.Ausar.Module
                     Checksum = 0, // TODO: There's probably an entry checksum field
                     CompressedOffset = 0,
                     CompressedSize = data.TotalCompressedSize,
-                    IsCompressed = data.TotalCompressedSize == data.TotalUncompressedSize,
+                    IsCompressed = data.TotalCompressedSize != data.TotalUncompressedSize,
                     UncompressedOffset = 0,
                     UncompressedSize = data.TotalUncompressedSize,
                 };
