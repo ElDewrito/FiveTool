@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
@@ -48,6 +50,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ausar\Memory\Stl\IStlHash.cs" />
+    <Compile Include="Ausar\Memory\Stl\StlList.cs" />
+    <Compile Include="Ausar\Memory\Stl\StlPair.cs" />
+    <Compile Include="Ausar\Memory\Stl\StlVector.cs" />
+    <Compile Include="Ausar\Memory\Tags\HashableId32.cs" />
+    <Compile Include="Ausar\Memory\Stl\StlUnorderedMap.cs" />
+    <Compile Include="Ausar\Memory\Tags\MemoryTagInfo.cs" />
+    <Compile Include="Ausar\Memory\Tags\MemoryGlobalIdMap.cs" />
+    <Compile Include="Ausar\Memory\V7475\V7475GlobalIdMap.cs" />
+    <Compile Include="Common\AlignmentUtil.cs" />
+    <Compile Include="Common\IBinaryStruct.cs" />
     <Compile Include="Ausar\Module\AusarModule.cs" />
     <Compile Include="Ausar\Module\ModuleBlockCompressor.cs" />
     <Compile Include="Ausar\Module\ModuleEntry.cs" />
@@ -59,6 +72,11 @@
     <Compile Include="Ausar\Module\Structures\ModuleStruct.cs" />
     <Compile Include="Ausar\Tags\StringId.cs" />
     <Compile Include="Common\BinarySearch.cs" />
+    <Compile Include="Common\Fnv1A64Hash.cs" />
+    <Compile Include="Common\IBinaryReadable.cs" />
+    <Compile Include="Common\IBinaryWritable.cs" />
+    <Compile Include="Memory\Pointer64.cs" />
+    <Compile Include="Memory\ProcessMemoryStream.cs" />
     <Compile Include="Common\StreamUtil.cs" />
     <Compile Include="Common\MagicNumber.cs" />
     <Compile Include="Common\StringBlob.cs" />
@@ -67,6 +85,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
