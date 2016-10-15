@@ -79,6 +79,7 @@
     <Compile Include="Scripting\BuiltIns\DataTypeBuiltIns.cs" />
     <Compile Include="Scripting\BuiltIns\DumpBuiltIns.cs" />
     <Compile Include="Scripting\BuiltIns\DialogBuiltIns.cs" />
+    <Compile Include="Scripting\BuiltIns\MemoryBuiltIns.cs" />
     <Compile Include="Scripting\Platform\Dialogs.cs" />
     <Compile Include="Scripting\Platform\FileSandbox.cs" />
     <Compile Include="Scripting\Platform\FiveToolPlatformAccessor.cs" />
@@ -100,6 +101,7 @@
     <EmbeddedResource Include="Scripting\BuiltIns\Console.lua" />
     <EmbeddedResource Include="Scripting\BuiltIns\DataTypes.lua" />
     <EmbeddedResource Include="Scripting\BuiltIns\Dialogs.lua" />
+    <EmbeddedResource Include="Scripting\BuiltIns\Memory.lua" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FiveLib\FiveLib.csproj">

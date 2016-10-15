@@ -22,6 +22,7 @@ namespace FiveTool.Scripting
             "Console.lua",
             "DataTypes.lua",
             "Dialogs.lua",
+            "Memory.lua",
             "Modules.lua",
         };
 
@@ -51,6 +52,7 @@ namespace FiveTool.Scripting
             DialogBuiltIns.Register(script);
             ConsoleBuiltIns.Register(script);
             DumpBuiltIns.Register(script);
+            MemoryBuiltIns.Register(script);
 
             foreach (var name in BuiltInScripts)
                 RunBuiltInScript(script, name);
