@@ -17,7 +17,7 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    7z a FiveTool.zip %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\Release\*.exe %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\Release\*.dll
+    7z a FiveTool.zip %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\x64\Release\*.exe %APPVEYOR_BUILD_FOLDER%\FiveTool\bin\x64\Release\*.dll
 
     7z a ModuleExtractor.zip %APPVEYOR_BUILD_FOLDER%\x64\Release\ModuleExtractor.exe
 artifacts:
