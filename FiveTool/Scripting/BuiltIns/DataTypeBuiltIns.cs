@@ -13,7 +13,13 @@ namespace FiveTool.Scripting.BuiltIns
     {
         public static void Register(Script script)
         {
-            script.Globals["StringId"] = UserData.CreateStatic<StringIdProxy>();
+            script.Globals["StringIdFactory"] = UserData.CreateStatic<StringIdProxy>();
+            script.Globals["BSwap32"] = (Func<uint, uint>)BSwap32;
+        }
+
+        private static uint BSwap32(uint val)
+        {
+            return ((val << 24) & 0xFF000000) | ((val << 8) & 0xFF0000) | ((val >> 8) & 0xFF00) | ((val >> 24) & 0xFF);
         }
     }
 }
