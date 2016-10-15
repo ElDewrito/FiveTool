@@ -1,4 +1,4 @@
-# FiveTool [![Build status](https://ci.appveyor.com/api/projects/status/31y8fmes9186ojax?svg=true)](https://ci.appveyor.com/project/Shockfire/fivetool)
+# FiveTool [![Build status](https://ci.appveyor.com/api/projects/status/rr4dll5erpenu2de?svg=true)](https://ci.appveyor.com/project/Shockfire/fivetool)
 
 FiveTool is an unofficial modding toolkit for Halo 5.
 The goal is to eventually create a powerful Lua-based system which can be used to inspect and modify game assets.
