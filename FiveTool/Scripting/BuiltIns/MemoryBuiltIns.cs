@@ -23,6 +23,7 @@ namespace FiveTool.Scripting.BuiltIns
         {
             script.Globals["MemGetLocalTagHandle"] = (Func<uint, long>)MemGetLocalTagHandle;
             script.Globals["MemGetLoadedTags"] = DynValue.NewCallback(MemGetLoadedTags, nameof(MemGetLoadedTags));
+            script.Globals["MemGetTagAddressFromHandle"] = (Func<uint, ulong>)MemGetTagAddressFromHandle;
         }
 
         private static long MemGetLocalTagHandle(uint globalId)
@@ -73,6 +74,29 @@ namespace FiveTool.Scripting.BuiltIns
                 Debug.WriteLine(ex);
 #endif
                 return DynValue.NewTable(script);
+            }
+        }
+
+        private static ulong MemGetTagAddressFromHandle(uint localHandle)
+        {
+            try
+            {
+                var process = GetGameProcess();
+                if (process == null)
+                    return 0;
+                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process, true)))
+                {
+                    var addresses = V7475TagAddressList.Read(process, memoryReader);
+                    ulong address;
+                    return addresses.TryGetTagAddress(localHandle, memoryReader, out address) ? address : 0;
+                }
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                Debug.WriteLine(ex);
+#endif
+                return 0;
             }
         }
 
