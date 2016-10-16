@@ -108,26 +108,10 @@ namespace FiveTool
 
             while (!done)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.Write("lua> ");
-                Console.ForegroundColor = ConsoleColor.White;
-                var line = Console.ReadLine();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
                 try
                 {
-                    // HACK: Stick a return statement in front of the line first, and then try without it if there's a syntax error
-                    // Otherwise users would need to manually type "return" in front of most lines
-                    DynValue result;
-                    try
-                    {
-                        result = script.DoString("return " + line);
-                    }
-                    catch (SyntaxErrorException)
-                    {
-                        result = script.DoString(line);
-                    }
+                    var func = ReadFunction(script);
+                    var result = func.Function.Call();
                     if (result.IsNotVoid())
                     {
                         // Dump without recursion to display the value in a friendly format
@@ -172,6 +156,59 @@ namespace FiveTool
                     return false;
             }
             return true;
+        }
+
+        private static DynValue ReadFunction(Script script)
+        {
+            var scriptStr = new StringBuilder();
+            while (true)
+            {
+                if (scriptStr.Length == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.Write("lua> ");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write(".... ");
+                }
+
+                Console.ForegroundColor = ConsoleColor.White;
+                var line = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Gray;
+
+                // Reset the script if the line is blank
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    scriptStr.Clear();
+                    Console.WriteLine();
+                    continue;
+                }
+
+                scriptStr.AppendLine(line);
+
+                // HACK: Stick a return statement in front of the line first, and then try without it if there's a syntax error
+                // Otherwise users would need to manually type "return" in front of most lines
+                try
+                {
+                    return script.LoadString("return " + scriptStr, null, "console");
+                }
+                catch (SyntaxErrorException e)
+                {
+                    if (e.IsPrematureStreamTermination)
+                        continue; // Need more input
+                }
+                try
+                {
+                    return script.LoadString(scriptStr.ToString(), null, "console");
+                }
+                catch (SyntaxErrorException e)
+                {
+                    if (!e.IsPrematureStreamTermination)
+                        throw; // Enough input was supplied, re-throw the exception
+                }
+            }
         }
     }
 }
