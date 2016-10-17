@@ -149,5 +149,18 @@ namespace FiveLib.Ausar.Module
                 entries[i].BuildResourceList(moduleStruct.Entries[i], resources);
             return new AusarModule(stream, moduleStruct.FileHeader, entries);
         }
+
+        /// <summary>
+        /// Reads the ID number from a module file without fully loading it.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <returns>The module's ID number.</returns>
+        public static ulong ReadId(Stream stream)
+        {
+            var reader = new BinaryReader(stream, Encoding.UTF8, /* leaveOpen */ true);
+            var headerStruct = new ModuleFileHeaderStruct();
+            headerStruct.Read(reader);
+            return headerStruct.Id;
+        }
     }
 }

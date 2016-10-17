@@ -61,6 +61,13 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             return new AusarModuleProxy(module, stream);
         }
 
+        public static UInt64Proxy ReadId(string path)
+        {
+            path = FileSandbox.ResolvePath(path);
+            using (var stream = File.OpenRead(path))
+                return new UInt64Proxy(AusarModule.ReadId(stream));
+        }
+
         public override string ToString() => $"(AusarModule, {Entries.Count} entries)";
 
         ~AusarModuleProxy()

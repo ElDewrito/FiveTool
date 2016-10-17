@@ -1,4 +1,4 @@
-﻿local loadedModules = {} -- Modules keyed by path
+﻿local loadedModules = {} -- Modules keyed by ID string
 
 function LoadModule (path)
 	if path == nil then
@@ -7,10 +7,11 @@ function LoadModule (path)
 			return nil
 		end
 	end
-	if loadedModules[path] == nil then
-		loadedModules[path] = AusarModule.LoadFromFile(path)
+	local id = Hex(AusarModule.ReadId(path))
+	if loadedModules[id] == nil then
+		loadedModules[id] = AusarModule.LoadFromFile(path)
 	end
-	return loadedModules[path]
+	return loadedModules[id]
 end
 
 DefineHelp ("Module", "LoadModule", {
@@ -26,7 +27,7 @@ DefineHelp ("Module", "LoadModule", {
 });
 
 function GetModuleEntry (name)
-	for path, module in pairs(loadedModules) do
+	for id, module in pairs(loadedModules) do
 		local entry = module.GetEntryByName(name)
 		if entry ~= nil then
 			return entry
@@ -48,7 +49,7 @@ DefineHelp ("Module", "GetModuleEntry", {
 });
 
 function FindModuleEntry (name)
-	for path, module in pairs(loadedModules) do
+	for id, module in pairs(loadedModules) do
 		for i, entry in ipairs(module.Entries) do
 			if string.find(entry.Name, name, 1, true) ~= nil then
 				return entry
@@ -72,7 +73,7 @@ DefineHelp ("Module", "FindModuleEntry", {
 
 function FindModuleEntries (name)
 	local entries = {}
-	for path, module in pairs(loadedModules) do
+	for id, module in pairs(loadedModules) do
 		for i, entry in ipairs(module.Entries) do
 			if string.find(entry.Name, name, 1, true) ~= nil then
 				table.insert(entries, entry)
