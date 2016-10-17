@@ -89,6 +89,7 @@
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleDataBlockProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Tags\StringIdProxy.cs" />
+    <Compile Include="Scripting\Proxies\UInt64Proxy.cs" />
     <Compile Include="Scripting\Proxies\ListProxy.cs" />
     <Compile Include="Scripting\ProxyUtil.cs" />
     <Compile Include="Scripting\ScriptFactory.cs" />

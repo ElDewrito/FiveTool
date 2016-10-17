@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FiveLib.Ausar.Memory.Tags;
 using FiveLib.Ausar.Memory.V7475;
 using FiveLib.Memory;
+using FiveTool.Scripting.Proxies;
 using MoonSharp.Interpreter;
 
 namespace FiveTool.Scripting.BuiltIns
@@ -23,7 +24,7 @@ namespace FiveTool.Scripting.BuiltIns
         {
             script.Globals["MemGetLocalTagHandle"] = (Func<uint, long>)MemGetLocalTagHandle;
             script.Globals["MemGetLoadedTags"] = DynValue.NewCallback(MemGetLoadedTags, nameof(MemGetLoadedTags));
-            script.Globals["MemGetTagAddressFromHandle"] = (Func<uint, ulong>)MemGetTagAddressFromHandle;
+            script.Globals["MemGetTagAddressFromHandle"] = (Func<uint, UInt64Proxy>)MemGetTagAddressFromHandle;
         }
 
         private static long MemGetLocalTagHandle(uint globalId)
@@ -77,18 +78,18 @@ namespace FiveTool.Scripting.BuiltIns
             }
         }
 
-        private static ulong MemGetTagAddressFromHandle(uint localHandle)
+        private static UInt64Proxy MemGetTagAddressFromHandle(uint localHandle)
         {
             try
             {
                 var process = GetGameProcess();
                 if (process == null)
-                    return 0;
+                    return UInt64Proxy.Zero;
                 using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process)))
                 {
                     var addresses = V7475TagAddressList.Read(process, memoryReader);
                     ulong address;
-                    return addresses.TryGetTagAddress(localHandle, memoryReader, out address) ? address : 0;
+                    return addresses.TryGetTagAddress(localHandle, memoryReader, out address) ? new UInt64Proxy(address) : UInt64Proxy.Zero;
                 }
             }
             catch (Exception ex)
@@ -96,7 +97,7 @@ namespace FiveTool.Scripting.BuiltIns
 #if DEBUG
                 Debug.WriteLine(ex);
 #endif
-                return 0;
+                return UInt64Proxy.Zero;
             }
         }
 

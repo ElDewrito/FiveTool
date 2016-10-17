@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Tags;
+using FiveTool.Scripting.Proxies;
 using FiveTool.Scripting.Proxies.Ausar.Tags;
 using MoonSharp.Interpreter;
 
@@ -14,6 +15,7 @@ namespace FiveTool.Scripting.BuiltIns
         public static void Register(Script script)
         {
             script.Globals["StringIdFactory"] = UserData.CreateStatic<StringIdProxy>();
+            script.Globals["UInt64Factory"] = UserData.CreateStatic<UInt64Proxy>();
             script.Globals["BSwap32"] = (Func<uint, uint>)BSwap32;
         }
 

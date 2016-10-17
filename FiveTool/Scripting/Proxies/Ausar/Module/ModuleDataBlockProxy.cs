@@ -19,7 +19,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             _block = block;
         }
 
-        public ulong Checksum => _block.Checksum;
+        public UInt64Proxy Checksum => new UInt64Proxy(_block.Checksum);
 
         public uint CompressedOffset => _block.CompressedOffset;
 

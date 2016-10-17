@@ -29,11 +29,11 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             _stream = stream;
         }
 
-        public ulong Id => _module.Id;
+        public UInt64Proxy Id => new UInt64Proxy(_module.Id);
 
         public int LoadedTagCount => _module.LoadedTagCount;
 
-        public ulong BuildVersionId => _module.BuildVersionId;
+        public UInt64Proxy BuildVersionId => new UInt64Proxy(_module.BuildVersionId);
 
         public ListProxy<ModuleEntry> Entries => new ListProxy<ModuleEntry>(_module.Entries);
 

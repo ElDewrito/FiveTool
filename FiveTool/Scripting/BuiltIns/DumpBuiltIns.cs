@@ -111,6 +111,11 @@ namespace FiveTool.Scripting.BuiltIns
                 Console.Write($"(StringId {obj})");
                 return;
             }
+            if (type == typeof(UInt64Proxy))
+            {
+                Console.Write($"(UInt64 {obj})");
+                return;
+            }
 
             if (depth == maxDepth)
             {

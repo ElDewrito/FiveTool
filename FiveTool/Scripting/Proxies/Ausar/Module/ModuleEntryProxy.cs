@@ -29,7 +29,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public ListProxy<ModuleDataBlock> Blocks => new ListProxy<ModuleDataBlock>(_entry.Blocks);
 
-        public long DataOffset => _entry.DataOffset;
+        public UInt64Proxy DataOffset => new UInt64Proxy((ulong)_entry.DataOffset);
 
         public uint TotalCompressedSize => _entry.TotalCompressedSize;
 
@@ -45,9 +45,9 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public uint GlobalId => _entry.GlobalId;
 
-        public ulong AssetId => _entry.AssetId;
+        public UInt64Proxy AssetId => new UInt64Proxy(_entry.AssetId);
 
-        public ulong AssetChecksum => _entry.AssetChecksum;
+        public UInt64Proxy AssetChecksum => new UInt64Proxy(_entry.AssetChecksum);
 
         public string GroupTag => _entry.GroupTag.Value != -1 ? _entry.GroupTag.ToString() : null;
 
