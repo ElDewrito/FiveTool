@@ -11,22 +11,16 @@ using MoonSharp.Interpreter;
 namespace FiveTool.Scripting.Proxies.Ausar.Module
 {
     [MoonSharpUserData]
-    internal class AusarModuleProxy : IDisposable
+    internal class AusarModuleProxy
     {
         private readonly AusarModule _module;
-        private Stream _stream;
+        private readonly FileInfo _file;
 
         [MoonSharpHidden]
-        public AusarModuleProxy(AusarModule module)
+        public AusarModuleProxy(AusarModule module, FileInfo file)
         {
             _module = module;
-        }
-
-        [MoonSharpHidden]
-        public AusarModuleProxy(AusarModule module, Stream stream)
-            : this(module)
-        {
-            _stream = stream;
+            _file = file;
         }
 
         public UInt64Proxy Id => new UInt64Proxy(_module.Id);
@@ -56,9 +50,9 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
         public static AusarModuleProxy LoadFromFile(string path)
         {
             path = FileSandbox.ResolvePath(path);
-            var stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
-            var module = AusarModule.Open(stream);
-            return new AusarModuleProxy(module, stream);
+            var file = new FileInfo(path);
+            using (var stream = file.OpenRead())
+                return new AusarModuleProxy(AusarModule.Open(stream), file);
         }
 
         public static UInt64Proxy ReadId(string path)
@@ -69,28 +63,5 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
         }
 
         public override string ToString() => $"(AusarModule, {Entries.Count} entries)";
-
-        ~AusarModuleProxy()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_stream != null)
-                {
-                    _stream.Dispose();
-                    _stream = null;
-                }
-            }
-        }
     }
 }

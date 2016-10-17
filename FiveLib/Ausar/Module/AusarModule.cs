@@ -16,23 +16,19 @@ namespace FiveLib.Ausar.Module
     /// </summary>
     public class AusarModule
     {
-        private readonly Stream _stream;
-        private readonly ModuleBlockCompressor _blockCompressor;
         private readonly List<ModuleEntry> _entries = new List<ModuleEntry>();
 
         private readonly Dictionary<string, ModuleEntry> _entriesByName; 
         private readonly Dictionary<uint, ModuleEntry> _entriesByGlobalTagId; 
 
-        private AusarModule(Stream stream, ModuleFileHeaderStruct fileHeader, IEnumerable<ModuleEntry> entries)
+        private AusarModule(long dataBaseOffset, ModuleFileHeaderStruct fileHeader, IEnumerable<ModuleEntry> entries)
         {
-            _stream = stream;
-            DataBaseOffset = stream.Position;
-            _blockCompressor = new ModuleBlockCompressor(_stream, DataBaseOffset);
             Id = fileHeader.Id;
             LoadedTagCount = fileHeader.LoadedTagCount;
             BuildVersionId = fileHeader.BuildVersionId;
             _entries.AddRange(entries);
             Entries = _entries.AsReadOnly();
+            DataBaseOffset = dataBaseOffset;
 
             _entriesByName = _entries.ToDictionary(e => e.Name, e => e);
             _entriesByGlobalTagId = _entries
@@ -87,36 +83,40 @@ namespace FiveLib.Ausar.Module
         /// <summary>
         /// Opens a stream on an entry.
         /// </summary>
+        /// <param name="moduleStream">A stream open on the module file.</param>
         /// <param name="entry">The entry.</param>
         /// <returns>A stream which can be used to read the entry data.</returns>
-        public ModuleBlockStream OpenEntry(ModuleEntry entry)
+        public ModuleBlockStream OpenEntry(Stream moduleStream, ModuleEntry entry)
         {
-            return new ModuleBlockStream(_blockCompressor, entry);
+            var blockCompressor = new ModuleBlockCompressor(moduleStream, DataBaseOffset);
+            return new ModuleBlockStream(blockCompressor, entry);
         }
 
         /// <summary>
         /// Extracts an entire entry to a stream.
         /// </summary>
+        /// <param name="moduleStream">A stream open on the module file.</param>
         /// <param name="entry">The entry.</param>
         /// <param name="outStream">The stream to extract to.</param>
-        public void ExtractEntry(ModuleEntry entry, Stream outStream)
+        public void ExtractEntry(Stream moduleStream, ModuleEntry entry, Stream outStream)
         {
-            using (var entryStream = OpenEntry(entry))
+            using (var entryStream = OpenEntry(moduleStream, entry))
                 entryStream.CopyTo(outStream);
         }
 
         /// <summary>
         /// Extracts an entry to a file. All directories in the path will be created.
         /// </summary>
+        /// <param name="moduleStream">A stream open on the module file.</param>
         /// <param name="entry">The entry.</param>
         /// <param name="filePath">The path of the output file to create.</param>
-        public void ExtractEntry(ModuleEntry entry, string filePath)
+        public void ExtractEntry(Stream moduleStream, ModuleEntry entry, string filePath)
         {
             var directories = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(directories))
                 Directory.CreateDirectory(directories);
             using (var fileStream = File.Create(filePath))
-                ExtractEntry(entry, fileStream);
+                ExtractEntry(moduleStream, entry, fileStream);
         }
 
         /// <summary>
@@ -130,7 +130,8 @@ namespace FiveLib.Ausar.Module
             var header = new ModuleFileHeaderStruct();
             var writer = new BinaryWriter(stream, Encoding.UTF8, /* leaveOpen */ true);
             header.Write(writer);
-            return new AusarModule(stream, header, Enumerable.Empty<ModuleEntry>());
+            var dataBaseOffset = stream.Position;
+            return new AusarModule(dataBaseOffset, header, Enumerable.Empty<ModuleEntry>());
         }
 
         /// <summary>
@@ -147,7 +148,8 @@ namespace FiveLib.Ausar.Module
             var resources = moduleStruct.ResourceEntries.Select(i => entries[i]).ToList();
             for (var i = 0; i < moduleStruct.Entries.Length; i++)
                 entries[i].BuildResourceList(moduleStruct.Entries[i], resources);
-            return new AusarModule(stream, moduleStruct.FileHeader, entries);
+            var dataBaseOffset = stream.Position;
+            return new AusarModule(dataBaseOffset, moduleStruct.FileHeader, entries);
         }
 
         /// <summary>
