@@ -22,7 +22,7 @@ namespace FiveLib.Ausar.Module
             _dataAreaOffset = dataAreaOffset;
         }
 
-        public void ReadBlock(long entryOffset, ModuleEntryBlock block, Stream outStream)
+        public void ReadBlock(long entryOffset, ModuleDataBlock block, Stream outStream)
         {
             _stream.Position = _dataAreaOffset + entryOffset + block.CompressedOffset;
             if (block.IsCompressed)

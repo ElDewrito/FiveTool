@@ -31,7 +31,7 @@ namespace FiveTool.Scripting
             UserData.RegisterAssembly();
             UserData.RegisterProxyType<AusarModuleProxy, AusarModule>(r => new AusarModuleProxy(r));
             UserData.RegisterProxyType<ModuleEntryProxy, ModuleEntry>(r => new ModuleEntryProxy(r));
-            UserData.RegisterProxyType<ModuleEntryBlockProxy, ModuleEntryBlock>(r => new ModuleEntryBlockProxy(r));
+            UserData.RegisterProxyType<ModuleDataBlockProxy, ModuleDataBlock>(r => new ModuleDataBlockProxy(r));
             Script.GlobalOptions.Platform = new FiveToolPlatformAccessor();
             FiveToolPlatformAccessor.ClearTempFiles();
         }

@@ -29,9 +29,13 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             _stream = stream;
         }
 
-        public ListProxy<ModuleEntry> Entries => new ListProxy<ModuleEntry>(_module.Entries);
+        public ulong Id => _module.Id;
 
-        public ListProxy<ModuleEntry> Resources => new ListProxy<ModuleEntry>(_module.Resources);
+        public int LoadedTagCount => _module.LoadedTagCount;
+
+        public ulong BuildVersionId => _module.BuildVersionId;
+
+        public ListProxy<ModuleEntry> Entries => new ListProxy<ModuleEntry>(_module.Entries);
 
         public long DataBaseOffset => _module.DataBaseOffset;
 
@@ -42,7 +46,7 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             return result;
         }
 
-        public ModuleEntry GetEntryByGlobalTagId(int id)
+        public ModuleEntry GetEntryByGlobalTagId(uint id)
         {
             ModuleEntry result;
             _module.GetEntryByGlobalTagId(id, out result);

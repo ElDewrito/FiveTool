@@ -7,7 +7,7 @@ using FiveLib.Ausar.Module.Structures;
 
 namespace FiveLib.Ausar.Module
 {
-    public class ModuleEntryBlock
+    public class ModuleDataBlock
     {
         public ulong Checksum { get; }
 
@@ -21,7 +21,7 @@ namespace FiveLib.Ausar.Module
 
         public bool IsCompressed { get; }
 
-        internal ModuleEntryBlock(ModuleEntryBlockStruct data)
+        internal ModuleDataBlock(ModuleDataBlockStruct data)
         {
             Checksum = data.Checksum;
             CompressedOffset = data.CompressedOffset;

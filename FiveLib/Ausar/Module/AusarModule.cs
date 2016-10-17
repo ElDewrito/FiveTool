@@ -19,39 +19,43 @@ namespace FiveLib.Ausar.Module
         private readonly Stream _stream;
         private readonly ModuleBlockCompressor _blockCompressor;
         private readonly List<ModuleEntry> _entries = new List<ModuleEntry>();
-        private readonly List<ModuleEntry> _resources = new List<ModuleEntry>();
 
         private readonly Dictionary<string, ModuleEntry> _entriesByName; 
-        private readonly Dictionary<int, ModuleEntry> _entriesByGlobalTagId; 
+        private readonly Dictionary<uint, ModuleEntry> _entriesByGlobalTagId; 
 
-        private AusarModule(Stream stream, IEnumerable<ModuleEntry> entries, IEnumerable<ModuleEntry> resources)
+        private AusarModule(Stream stream, ModuleFileHeaderStruct fileHeader, IEnumerable<ModuleEntry> entries)
         {
             _stream = stream;
             DataBaseOffset = stream.Position;
             _blockCompressor = new ModuleBlockCompressor(_stream, DataBaseOffset);
-
+            Id = fileHeader.Id;
+            LoadedTagCount = fileHeader.LoadedTagCount;
+            BuildVersionId = fileHeader.BuildVersionId;
             _entries.AddRange(entries);
-            _resources.AddRange(resources);
+            Entries = _entries.AsReadOnly();
 
             _entriesByName = _entries.ToDictionary(e => e.Name, e => e);
             _entriesByGlobalTagId = _entries
-                .Where(e => e.GlobalTagId != -1)
-                .ToDictionary(e => e.GlobalTagId, e => e);
-
-            Entries = _entries.AsReadOnly();
-            Resources = _resources.AsReadOnly();
+                .Where(e => e.GlobalId != 0xFFFFFFFF)
+                .ToDictionary(e => e.GlobalId, e => e);
         }
+
+        /// <summary>
+        /// Gets the module's unique ID number.
+        /// </summary>
+        public ulong Id { get; }
+
+        /// <summary>
+        /// Gets the number of tags in the module's loadmanifest.
+        /// </summary>
+        public int LoadedTagCount { get; }
+
+        public ulong BuildVersionId { get; }
 
         /// <summary>
         /// Gets the entries for files stored in the module. Read-only.
         /// </summary>
         public IList<ModuleEntry> Entries { get; }
-
-        /// <summary>
-        /// Gets the entries for resource files stored in the module. Read-only.
-        /// These entries can also be found in the main <see cref="Entries"/> list.
-        /// </summary>
-        public IList<ModuleEntry> Resources { get; }
 
         /// <summary>
         /// Gets the file offset where compressed data begins.
@@ -75,7 +79,7 @@ namespace FiveLib.Ausar.Module
         /// <param name="id">The global tag ID to search for.</param>
         /// <param name="entry">The result variable.</param>
         /// <returns><c>true</c> if the entry was found.</returns>
-        public bool GetEntryByGlobalTagId(int id, out ModuleEntry entry)
+        public bool GetEntryByGlobalTagId(uint id, out ModuleEntry entry)
         {
             return _entriesByGlobalTagId.TryGetValue(id, out entry);
         }
@@ -126,7 +130,7 @@ namespace FiveLib.Ausar.Module
             var header = new ModuleFileHeaderStruct();
             var writer = new BinaryWriter(stream, Encoding.UTF8, /* leaveOpen */ true);
             header.Write(writer);
-            return new AusarModule(stream, Enumerable.Empty<ModuleEntry>(), Enumerable.Empty<ModuleEntry>());
+            return new AusarModule(stream, header, Enumerable.Empty<ModuleEntry>());
         }
 
         /// <summary>
@@ -139,9 +143,11 @@ namespace FiveLib.Ausar.Module
             var reader = new BinaryReader(stream, Encoding.UTF8, /* leaveOpen */ true);
             var moduleStruct = new ModuleStruct();
             moduleStruct.Read(reader);
-            var entries = moduleStruct.Entries.Select(e => new ModuleEntry(e, moduleStruct)).ToList();
-            var resources = moduleStruct.ResourceEntries.Select(i => entries[i]);
-            return new AusarModule(stream, entries, resources);
+            var entries = moduleStruct.Entries.Select((e, i) => new ModuleEntry(i, e, moduleStruct)).ToList();
+            var resources = moduleStruct.ResourceEntries.Select(i => entries[i]).ToList();
+            for (var i = 0; i < moduleStruct.Entries.Length; i++)
+                entries[i].BuildResourceList(moduleStruct.Entries[i], resources);
+            return new AusarModule(stream, moduleStruct.FileHeader, entries);
         }
     }
 }

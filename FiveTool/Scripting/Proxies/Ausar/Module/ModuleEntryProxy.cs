@@ -19,35 +19,35 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             _entry = entry;
         }
 
+        public int Index => _entry.Index + 1;
+
         public string Name => _entry.Name;
 
-        public int ParentIndex => _entry.ParentIndex;
+        public int ParentIndex => _entry.ParentIndex != -1 ? _entry.ParentIndex + 1 : -1;
 
-        public int Unknown8 => _entry.Unknown8;
+        public ListProxy<ModuleEntry> Resources => new ListProxy<ModuleEntry>(_entry.Resources); 
 
-        public int UnknownC => _entry.UnknownC;
+        public ListProxy<ModuleDataBlock> Blocks => new ListProxy<ModuleDataBlock>(_entry.Blocks);
 
-        public ListProxy<ModuleEntryBlock> Blocks => new ListProxy<ModuleEntryBlock>(_entry.Blocks);
-
-        public long CompressedOffset => _entry.CompressedOffset;
+        public long DataOffset => _entry.DataOffset;
 
         public uint TotalCompressedSize => _entry.TotalCompressedSize;
 
         public uint TotalUncompressedSize => _entry.TotalUncompressedSize;
 
-        public byte Unknown28 => _entry.Unknown28;
+        public byte HeaderAlignment => _entry.HeaderAlignment;
 
-        public byte Unknown29 => _entry.Unknown29;
+        public byte TagDataAlignment => _entry.TagDataAlignment;
 
-        public byte Unknown2A => _entry.Unknown2A;
+        public byte ResourceDataAlignment => _entry.ResourceDataAlignment;
 
-        public byte Unknown2B => _entry.Unknown2B;
+        public bool IsRawFile => _entry.IsRawFile;
 
-        public int GlobalTagId => _entry.GlobalTagId;
+        public uint GlobalId => _entry.GlobalId;
 
-        public long SourceTagId => _entry.SourceTagId;
+        public ulong AssetId => _entry.AssetId;
 
-        public long Unknown38 => _entry.Unknown38;
+        public ulong AssetChecksum => _entry.AssetChecksum;
 
         public string GroupTag => _entry.GroupTag.Value != -1 ? _entry.GroupTag.ToString() : null;
 
@@ -57,11 +57,11 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public uint UncompressedResourceDataSize => _entry.UncompressedResourceDataSize;
 
-        public short Unknown50 => _entry.Unknown50;
+        public short HeaderBlockCount => _entry.HeaderBlockCount;
 
-        public short Unknown52 => _entry.Unknown52;
+        public short TagDataBlockCount => _entry.TagDataBlockCount;
 
-        public int Unknown54 => _entry.Unknown54;
+        public int ResourceBlockCount => _entry.ResourceBlockCount;
 
         public override string ToString() => $"(ModuleEntry \"{Name}\")";
     }

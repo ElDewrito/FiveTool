@@ -86,7 +86,7 @@
     <Compile Include="Scripting\Platform\PathToken.cs" />
     <Compile Include="Scripting\Platform\PathUtil.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\AusarModuleProxy.cs" />
-    <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryBlockProxy.cs" />
+    <Compile Include="Scripting\Proxies\Ausar\Module\ModuleDataBlockProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Module\ModuleEntryProxy.cs" />
     <Compile Include="Scripting\Proxies\Ausar\Tags\StringIdProxy.cs" />
     <Compile Include="Scripting\Proxies\ListProxy.cs" />

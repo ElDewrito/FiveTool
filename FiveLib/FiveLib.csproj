@@ -66,9 +66,9 @@
     <Compile Include="Ausar\Module\AusarModule.cs" />
     <Compile Include="Ausar\Module\ModuleBlockCompressor.cs" />
     <Compile Include="Ausar\Module\ModuleEntry.cs" />
-    <Compile Include="Ausar\Module\ModuleEntryBlock.cs" />
+    <Compile Include="Ausar\Module\ModuleDataBlock.cs" />
     <Compile Include="Ausar\Module\ModuleBlockStream.cs" />
-    <Compile Include="Ausar\Module\Structures\ModuleEntryBlockStruct.cs" />
+    <Compile Include="Ausar\Module\Structures\ModuleDataBlockStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleEntryStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleFileHeaderStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleStruct.cs" />

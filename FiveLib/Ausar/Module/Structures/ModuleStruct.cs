@@ -18,7 +18,7 @@ namespace FiveLib.Ausar.Module.Structures
 
         public int[] ResourceEntries { get; set; } = new int[0];
 
-        public ModuleEntryBlockStruct[] CompressedBlocks { get; set; } = new ModuleEntryBlockStruct[0];
+        public ModuleDataBlockStruct[] CompressedBlocks { get; set; } = new ModuleDataBlockStruct[0];
 
         public void Read(BinaryReader reader)
         {
@@ -71,12 +71,12 @@ namespace FiveLib.Ausar.Module.Structures
             return files;
         }
 
-        private static ModuleEntryBlockStruct[] ReadCompressedBlocks(BinaryReader reader, ModuleFileHeaderStruct header)
+        private static ModuleDataBlockStruct[] ReadCompressedBlocks(BinaryReader reader, ModuleFileHeaderStruct header)
         {
-            var blocks = new ModuleEntryBlockStruct[header.CompressedBlockCount];
-            for (var i = 0; i < header.CompressedBlockCount; i++)
+            var blocks = new ModuleDataBlockStruct[header.DataBlockCount];
+            for (var i = 0; i < header.DataBlockCount; i++)
             {
-                var block = new ModuleEntryBlockStruct();
+                var block = new ModuleDataBlockStruct();
                 block.Read(reader);
                 blocks[i] = block;
             }

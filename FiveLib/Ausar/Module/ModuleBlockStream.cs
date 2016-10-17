@@ -11,19 +11,19 @@ namespace FiveLib.Ausar.Module
     public class ModuleBlockStream : Stream
     {
         private readonly ModuleBlockCompressor _blockCompressor;
-        private readonly List<ModuleEntryBlock> _blocks; // Sorted by uncompressed offset for quick seeking
+        private readonly List<ModuleDataBlock> _blocks; // Sorted by uncompressed offset for quick seeking
         private readonly long _entryOffset;
         private readonly long _length;
 
         private long _position;
-        private ModuleEntryBlock _currentBlock; // Can be null
+        private ModuleDataBlock _currentBlock; // Can be null
         private MemoryStream _currentBlockStream; // Can be null
 
         public ModuleBlockStream(ModuleBlockCompressor blockCompressor, ModuleEntry entry)
         {
             _blockCompressor = blockCompressor;
             _blocks = entry.Blocks.OrderBy(b => b.UncompressedOffset).ToList();
-            _entryOffset = entry.CompressedOffset;
+            _entryOffset = entry.DataOffset;
             _length = entry.TotalUncompressedSize;
         }
          
@@ -113,7 +113,7 @@ namespace FiveLib.Ausar.Module
             return true;
         }
 
-        private static int FindBlock(IList<ModuleEntryBlock> blocks, long position)
+        private static int FindBlock(IList<ModuleDataBlock> blocks, long position)
         {
             var index = BinarySearch.Search(blocks, position, b => b.UncompressedOffset);
             if (index < 0)
@@ -130,7 +130,7 @@ namespace FiveLib.Ausar.Module
             _currentBlock = null;
         }
 
-        private static bool IsInBlock(long position, ModuleEntryBlock block)
+        private static bool IsInBlock(long position, ModuleDataBlock block)
         {
             return position >= block.UncompressedOffset && position < block.UncompressedOffset + block.UncompressedSize;
         }

@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FiveLib.Tests.Ausar.Module.Structures
 {
     [TestClass]
-    public class ModuleEntryBlockStructTests
+    public class ModuleDataBlockStructTests
     {
         private static readonly byte[] DummyBlockBytes =
         {
@@ -21,7 +21,7 @@ namespace FiveLib.Tests.Ausar.Module.Structures
         [TestMethod]
         public void TestReadingDummyCompressedBlock()
         {
-            var block = new ModuleEntryBlockStruct();
+            var block = new ModuleDataBlockStruct();
             using (var reader = new BinaryReader(new MemoryStream(DummyBlockBytes)))
             {
                 block.Read(reader);
@@ -39,7 +39,7 @@ namespace FiveLib.Tests.Ausar.Module.Structures
         [TestMethod]
         public void TestWritingDummyCompressedBlock()
         {
-            var block = new ModuleEntryBlockStruct
+            var block = new ModuleDataBlockStruct
             {
                 Checksum = 1,
                 CompressedOffset = 2,

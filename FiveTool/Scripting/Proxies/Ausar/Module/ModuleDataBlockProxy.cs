@@ -9,12 +9,12 @@ using MoonSharp.Interpreter;
 namespace FiveTool.Scripting.Proxies.Ausar.Module
 {
     [MoonSharpUserData]
-    internal class ModuleEntryBlockProxy
+    internal class ModuleDataBlockProxy
     {
-        private readonly ModuleEntryBlock _block;
+        private readonly ModuleDataBlock _block;
 
         [MoonSharpHidden]
-        public ModuleEntryBlockProxy(ModuleEntryBlock block)
+        public ModuleDataBlockProxy(ModuleDataBlock block)
         {
             _block = block;
         }
@@ -31,6 +31,6 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public bool IsCompressed => _block.IsCompressed;
 
-        public override string ToString() => "(ModuleEntryBlock)";
+        public override string ToString() => "(ModuleDataBlock)";
     }
 }

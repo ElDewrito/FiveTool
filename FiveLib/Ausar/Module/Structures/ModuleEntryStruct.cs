@@ -8,39 +8,47 @@ using FiveLib.Common;
 
 namespace FiveLib.Ausar.Module.Structures
 {
+    [Flags]
+    internal enum ModuleEntryFlags : byte
+    {
+        Compressed = 1 << 0,
+        HasBlocks = 1 << 1,
+        RawFile = 1 << 2,
+    }
+
     internal class ModuleEntryStruct
     {
         public uint NameOffset { get; set; }
 
-        public int ParentFileIndex { get; set; }
+        public int ParentFileIndex { get; set; } = -1;
 
-        public int Unknown8 { get; set; }
+        public int ResourceCount { get; set; }
 
-        public int UnknownC { get; set; }
+        public int FirstResourceIndex { get; set; }
 
         public int BlockCount { get; set; }
 
         public int FirstBlockIndex { get; set; }
 
-        public long CompressedOffset { get; set; }
+        public long DataOffset { get; set; }
 
         public uint TotalCompressedSize { get; set; }
 
         public uint TotalUncompressedSize { get; set; }
 
-        public byte Unknown28 { get; set; }
+        public byte HeaderAlignment { get; set; }
 
-        public byte Unknown29 { get; set; }
+        public byte TagDataAlignment { get; set; }
 
-        public byte Unknown2A { get; set; }
+        public byte ResourceDataAlignment { get; set; }
 
-        public byte Unknown2B { get; set; }
+        public ModuleEntryFlags Flags { get; set; }
 
-        public int GlobalTagId { get; set; }
+        public uint GlobalId { get; set; }
 
-        public long SourceTagId { get; set; }
+        public ulong AssetId { get; set; }
 
-        public long Unknown38 { get; set; }
+        public ulong AssetChecksum { get; set; }
 
         public MagicNumber GroupTag { get; set; }
 
@@ -50,64 +58,64 @@ namespace FiveLib.Ausar.Module.Structures
 
         public uint UncompressedResourceDataSize { get; set; }
 
-        public short Unknown50 { get; set; }
+        public short HeaderBlockCount { get; set; }
 
-        public short Unknown52 { get; set; }
+        public short TagDataBlockCount { get; set; }
 
-        public int Unknown54 { get; set; }
+        public int ResourceBlockCount { get; set; }
 
         public void Read(BinaryReader reader)
         {
             NameOffset = reader.ReadUInt32();
             ParentFileIndex = reader.ReadInt32();
-            Unknown8 = reader.ReadInt32();
-            UnknownC = reader.ReadInt32();
+            ResourceCount = reader.ReadInt32();
+            FirstResourceIndex = reader.ReadInt32();
             BlockCount = reader.ReadInt32();
             FirstBlockIndex = reader.ReadInt32();
-            CompressedOffset = reader.ReadInt64();
+            DataOffset = reader.ReadInt64();
             TotalCompressedSize = reader.ReadUInt32();
             TotalUncompressedSize = reader.ReadUInt32();
-            Unknown28 = reader.ReadByte();
-            Unknown29 = reader.ReadByte();
-            Unknown2A = reader.ReadByte();
-            Unknown2B = reader.ReadByte();
-            GlobalTagId = reader.ReadInt32();
-            SourceTagId = reader.ReadInt64();
-            Unknown38 = reader.ReadInt64();
+            HeaderAlignment = reader.ReadByte();
+            TagDataAlignment = reader.ReadByte();
+            ResourceDataAlignment = reader.ReadByte();
+            Flags = (ModuleEntryFlags)reader.ReadByte();
+            GlobalId = reader.ReadUInt32();
+            AssetId = reader.ReadUInt64();
+            AssetChecksum = reader.ReadUInt64();
             GroupTag = new MagicNumber(reader.ReadInt32());
             UncompressedHeaderSize = reader.ReadUInt32();
             UncompressedTagDataSize = reader.ReadUInt32();
             UncompressedResourceDataSize = reader.ReadUInt32();
-            Unknown50 = reader.ReadInt16();
-            Unknown52 = reader.ReadInt16();
-            Unknown54 = reader.ReadInt32();
+            HeaderBlockCount = reader.ReadInt16();
+            TagDataBlockCount = reader.ReadInt16();
+            ResourceBlockCount = reader.ReadInt32();
         }
 
         public void Write(BinaryWriter writer)
         {
             writer.Write(NameOffset);
             writer.Write(ParentFileIndex);
-            writer.Write(Unknown8);
-            writer.Write(UnknownC);
+            writer.Write(ResourceCount);
+            writer.Write(FirstResourceIndex);
             writer.Write(BlockCount);
             writer.Write(FirstBlockIndex);
-            writer.Write(CompressedOffset);
+            writer.Write(DataOffset);
             writer.Write(TotalCompressedSize);
             writer.Write(TotalUncompressedSize);
-            writer.Write(Unknown28);
-            writer.Write(Unknown29);
-            writer.Write(Unknown2A);
-            writer.Write(Unknown2B);
-            writer.Write(GlobalTagId);
-            writer.Write(SourceTagId);
-            writer.Write(Unknown38);
+            writer.Write(HeaderAlignment);
+            writer.Write(TagDataAlignment);
+            writer.Write(ResourceDataAlignment);
+            writer.Write((byte)Flags);
+            writer.Write(GlobalId);
+            writer.Write(AssetId);
+            writer.Write(AssetChecksum);
             writer.Write(GroupTag.Value);
             writer.Write(UncompressedHeaderSize);
             writer.Write(UncompressedTagDataSize);
             writer.Write(UncompressedResourceDataSize);
-            writer.Write(Unknown50);
-            writer.Write(Unknown52);
-            writer.Write(Unknown54);
+            writer.Write(HeaderBlockCount);
+            writer.Write(TagDataBlockCount);
+            writer.Write(ResourceBlockCount);
         }
     }
 }

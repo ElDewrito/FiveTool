@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FiveLib.Ausar.Module.Structures
 {
-    internal class ModuleEntryBlockStruct
+    internal class ModuleDataBlockStruct
     {
         // MurmurHash3_128 of the uncompressed block
         public ulong Checksum { get; set; }

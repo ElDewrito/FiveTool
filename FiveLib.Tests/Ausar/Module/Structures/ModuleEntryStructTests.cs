@@ -28,27 +28,27 @@ namespace FiveLib.Tests.Ausar.Module.Structures
 
             Assert.AreEqual(1U, entry.NameOffset);
             Assert.AreEqual(2, entry.ParentFileIndex);
-            Assert.AreEqual(3, entry.Unknown8);
-            Assert.AreEqual(4, entry.UnknownC);
+            Assert.AreEqual(3, entry.ResourceCount);
+            Assert.AreEqual(4, entry.FirstResourceIndex);
             Assert.AreEqual(5, entry.BlockCount);
             Assert.AreEqual(6, entry.FirstBlockIndex);
-            Assert.AreEqual(7, entry.CompressedOffset);
+            Assert.AreEqual(7, entry.DataOffset);
             Assert.AreEqual(8U, entry.TotalCompressedSize);
             Assert.AreEqual(9U, entry.TotalUncompressedSize);
-            Assert.AreEqual(10, entry.Unknown28);
-            Assert.AreEqual(11, entry.Unknown29);
-            Assert.AreEqual(12, entry.Unknown2A);
-            Assert.AreEqual(13, entry.Unknown2B);
-            Assert.AreEqual(14, entry.GlobalTagId);
-            Assert.AreEqual(15, entry.SourceTagId);
-            Assert.AreEqual(16, entry.Unknown38);
+            Assert.AreEqual(10, entry.HeaderAlignment);
+            Assert.AreEqual(11, entry.TagDataAlignment);
+            Assert.AreEqual(12, entry.ResourceDataAlignment);
+            Assert.AreEqual((ModuleEntryFlags)13, entry.Flags);
+            Assert.AreEqual(14U, entry.GlobalId);
+            Assert.AreEqual(15U, entry.AssetId);
+            Assert.AreEqual(16U, entry.AssetChecksum);
             Assert.AreEqual(new MagicNumber("abcd"), entry.GroupTag);
             Assert.AreEqual(17U, entry.UncompressedHeaderSize);
             Assert.AreEqual(18U, entry.UncompressedTagDataSize);
             Assert.AreEqual(19U, entry.UncompressedResourceDataSize);
-            Assert.AreEqual(20, entry.Unknown50);
-            Assert.AreEqual(21, entry.Unknown52);
-            Assert.AreEqual(22, entry.Unknown54);
+            Assert.AreEqual(20, entry.HeaderBlockCount);
+            Assert.AreEqual(21, entry.TagDataBlockCount);
+            Assert.AreEqual(22, entry.ResourceBlockCount);
         }
 
         [TestMethod]
@@ -58,27 +58,27 @@ namespace FiveLib.Tests.Ausar.Module.Structures
             {
                 NameOffset = 1,
                 ParentFileIndex = 2,
-                Unknown8 = 3,
-                UnknownC = 4,
+                ResourceCount = 3,
+                FirstResourceIndex = 4,
                 BlockCount = 5,
                 FirstBlockIndex = 6,
-                CompressedOffset = 7,
+                DataOffset = 7,
                 TotalCompressedSize = 8,
                 TotalUncompressedSize = 9,
-                Unknown28 = 10,
-                Unknown29 = 11,
-                Unknown2A = 12,
-                Unknown2B = 13,
-                GlobalTagId = 14,
-                SourceTagId = 15,
-                Unknown38 = 16,
+                HeaderAlignment = 10,
+                TagDataAlignment = 11,
+                ResourceDataAlignment = 12,
+                Flags = (ModuleEntryFlags)13,
+                GlobalId = 14,
+                AssetId = 15,
+                AssetChecksum = 16,
                 GroupTag = new MagicNumber("abcd"),
                 UncompressedHeaderSize = 17,
                 UncompressedTagDataSize = 18,
                 UncompressedResourceDataSize = 19,
-                Unknown50 = 20,
-                Unknown52 = 21,
-                Unknown54 = 22
+                HeaderBlockCount = 20,
+                TagDataBlockCount = 21,
+                ResourceBlockCount = 22
             };
 
             byte[] writtenBytes;

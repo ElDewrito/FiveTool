@@ -15,35 +15,37 @@ namespace FiveLib.Ausar.Module
     [DebuggerDisplay("ModuleEntry {Name}")]
     public class ModuleEntry
     {
+        private readonly List<ModuleEntry> _resources = new List<ModuleEntry>();
+
+        public int Index { get; }
+         
         public string Name { get; }
 
         public int ParentIndex { get; }
 
-        public int Unknown8 { get; }
+        public IList<ModuleEntry> Resources { get; } 
 
-        public int UnknownC { get; }
+        public IList<ModuleDataBlock> Blocks { get; }
 
-        public IList<ModuleEntryBlock> Blocks { get; }
-
-        public long CompressedOffset { get; }
+        public long DataOffset { get; }
 
         public uint TotalCompressedSize { get; }
 
         public uint TotalUncompressedSize { get; }
 
-        public byte Unknown28 { get; }
+        public byte HeaderAlignment { get; }
 
-        public byte Unknown29 { get; }
+        public byte TagDataAlignment { get; }
 
-        public byte Unknown2A { get; }
+        public byte ResourceDataAlignment { get; }
 
-        public byte Unknown2B { get; }
+        public bool IsRawFile { get; }
 
-        public int GlobalTagId { get; }
+        public uint GlobalId { get; }
 
-        public long SourceTagId { get; }
+        public ulong AssetId { get; }
 
-        public long Unknown38 { get; }
+        public ulong AssetChecksum { get; }
 
         public MagicNumber GroupTag { get; }
 
@@ -53,62 +55,70 @@ namespace FiveLib.Ausar.Module
 
         public uint UncompressedResourceDataSize { get; }
 
-        public short Unknown50 { get; }
+        public short HeaderBlockCount { get; }
 
-        public short Unknown52 { get; }
+        public short TagDataBlockCount { get; }
 
-        public int Unknown54 { get; }
+        public int ResourceBlockCount { get; }
 
-        internal ModuleEntry(ModuleEntryStruct data, ModuleStruct module)
+        internal ModuleEntry(int index, ModuleEntryStruct data, ModuleStruct module)
         {
+            Index = index;
             Name = module.StringTable.GetStringAtOffset((int)data.NameOffset);
             ParentIndex = data.ParentFileIndex;
-            Unknown8 = data.Unknown8;
-            UnknownC = data.UnknownC;
+            Resources = _resources.AsReadOnly();
             Blocks = GetBlockList(data, module).AsReadOnly();
-            CompressedOffset = data.CompressedOffset;
+            DataOffset = data.DataOffset;
             TotalCompressedSize = data.TotalCompressedSize;
             TotalUncompressedSize = data.TotalUncompressedSize;
-            Unknown28 = data.Unknown28;
-            Unknown29 = data.Unknown29;
-            Unknown2A = data.Unknown2A;
-            Unknown2B = data.Unknown2B;
-            GlobalTagId = data.GlobalTagId;
-            SourceTagId = data.SourceTagId;
-            Unknown38 = data.Unknown38;
+            HeaderAlignment = data.HeaderAlignment;
+            TagDataAlignment = data.TagDataAlignment;
+            ResourceDataAlignment = data.ResourceDataAlignment;
+            IsRawFile = (data.Flags & ModuleEntryFlags.RawFile) != 0;
+            GlobalId = data.GlobalId;
+            AssetId = data.AssetId;
+            AssetChecksum = data.AssetChecksum;
             GroupTag = data.GroupTag;
             UncompressedHeaderSize = data.UncompressedHeaderSize;
             UncompressedTagDataSize = data.UncompressedTagDataSize;
             UncompressedResourceDataSize = data.UncompressedResourceDataSize;
-            Unknown50 = data.Unknown50;
-            Unknown52 = data.Unknown52;
-            Unknown54 = data.Unknown54;
+            HeaderBlockCount = data.HeaderBlockCount;
+            TagDataBlockCount = data.TagDataBlockCount;
+            ResourceBlockCount = data.ResourceBlockCount;
         }
 
-        private static List<ModuleEntryBlock> GetBlockList(ModuleEntryStruct data, ModuleStruct module)
+        internal void BuildResourceList(ModuleEntryStruct data, List<ModuleEntry> resources)
         {
-            var blocks = new List<ModuleEntryBlock>(data.BlockCount);
-            if (data.BlockCount > 0)
+            for (var i = 0; i < data.ResourceCount; i++)
+                _resources.Add(resources[data.FirstResourceIndex + i]);
+        }
+
+        private static List<ModuleDataBlock> GetBlockList(ModuleEntryStruct data, ModuleStruct module)
+        {
+            var blocks = new List<ModuleDataBlock>(data.BlockCount);
+            if (data.TotalCompressedSize == 0)
+                return blocks;
+            if ((data.Flags & ModuleEntryFlags.HasBlocks) != 0)
             {
                 for (var i = 0; i < data.BlockCount; i++)
                 {
                     var block = module.CompressedBlocks[data.FirstBlockIndex + i];
-                    blocks.Add(new ModuleEntryBlock(block));
+                    blocks.Add(new ModuleDataBlock(block));
                 }
             }
             else
             {
                 // If an entry has 0 blocks, then make one
-                var blockStruct = new ModuleEntryBlockStruct
+                var blockStruct = new ModuleDataBlockStruct
                 {
-                    Checksum = 0, // TODO: There's probably an entry checksum field
+                    Checksum = data.AssetChecksum,
                     CompressedOffset = 0,
                     CompressedSize = data.TotalCompressedSize,
-                    IsCompressed = data.TotalCompressedSize != data.TotalUncompressedSize,
+                    IsCompressed = (data.Flags & ModuleEntryFlags.Compressed) != 0,
                     UncompressedOffset = 0,
                     UncompressedSize = data.TotalUncompressedSize,
                 };
-                blocks.Add(new ModuleEntryBlock(blockStruct));
+                blocks.Add(new ModuleDataBlock(blockStruct));
             }
             return blocks;
         } 
