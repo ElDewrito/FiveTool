@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -10,26 +11,26 @@ namespace FiveLib.Memory
     /// </summary>
     public class ProcessMemoryStream : Stream
     {
-        private const int BufferSize = 0x1000;
-        private const ulong PositionMask = 0xFFF; // Mask to get the buffer offset from the position
+        private const int PageSize = 0x1000;
+        private const ulong PageIndexMask = ~0xFFFUL;
+        private const ulong PageOffsetMask = 0xFFFUL;
 
         private ulong _position;
 
-        private readonly byte[] _readBuffer; // null if buffering is disabled
-        private ulong _bufferStart;
-        private int _bufferLength;
+        private readonly LinkedList<CachedPage> _pages = new LinkedList<CachedPage>(); // Page at the front is most-recently used
+        private readonly Dictionary<ulong, LinkedListNode<CachedPage>> _pagesByAddress = new Dictionary<ulong, LinkedListNode<CachedPage>>();
+        private readonly int _cacheSize;
 
         /// <summary>
         /// Constructs a <see cref="ProcessMemoryStream"/> that accesses the memory of a process.
         /// </summary>
         /// <param name="process">The process to access the memory of.</param>
-        /// <param name="buffered"><c>true</c> if read buffering should be used.</param>
-        public ProcessMemoryStream(Process process, bool buffered)
+        /// <param name="cacheSize">The maximum number of pages to cache.</param>
+        public ProcessMemoryStream(Process process, int cacheSize = 8)
         {
             BaseProcess = process;
             _position = (ulong)process.MainModule.BaseAddress;
-            if (buffered)
-                _readBuffer = new byte[BufferSize];
+            _cacheSize = cacheSize;
         }
 
         /// <summary>
@@ -53,7 +54,8 @@ namespace FiveLib.Memory
 
         public override void Flush()
         {
-            _bufferLength = 0; // Invalidate the buffer
+            _pages.Clear();
+            _pagesByAddress.Clear();
         }
 
         public override long Seek(long offset, SeekOrigin origin)
@@ -82,18 +84,19 @@ namespace FiveLib.Memory
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return _readBuffer != null ? BufferedRead(buffer, offset, count) : RawRead(buffer, offset, count);
+            return _cacheSize > 0 ? CachedRead(buffer, offset, count) : RawRead(buffer, offset, count);
         }
 
-        private int BufferedRead(byte[] buffer, int offset, int count)
+        private int CachedRead(byte[] buffer, int offset, int count)
         {
             var bytesRead = 0;
             var bytesRemaining = count;
-            while (bytesRemaining > 0 && FillBuffer())
+            byte[] page;
+            while (bytesRemaining > 0 && (page = LoadCurrentPage()) != null)
             {
-                var bufferPosition = ToBufferPosition(_position);
-                var bytesAvailable = Math.Min(bytesRemaining, _bufferLength - bufferPosition);
-                Buffer.BlockCopy(_readBuffer, bufferPosition, buffer, offset + bytesRead, bytesAvailable);
+                var pageOffset = GetPageOffset(_position);
+                var bytesAvailable = Math.Min(bytesRemaining, PageSize - pageOffset);
+                Buffer.BlockCopy(page, pageOffset, buffer, offset + bytesRead, bytesAvailable);
                 _position += (ulong)bytesAvailable;
                 bytesRead += bytesAvailable;
                 bytesRemaining -= bytesAvailable;
@@ -110,38 +113,70 @@ namespace FiveLib.Memory
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            var bytesWritten = WriteMemory(BaseProcess, _position, buffer, offset, count);
-            if (InsideBuffer())
-            {
-                // Update the read buffer to reflect the written bytes
-                var bufferPosition = ToBufferPosition(_position);
-                var bytesAvailable = Math.Min(bytesWritten, _bufferLength - bufferPosition);
-                Buffer.BlockCopy(buffer, offset, _readBuffer, bufferPosition, bytesAvailable);
-            }
+            WriteMemory(BaseProcess, _position, buffer, offset, count);
             _position += (ulong)count;
+            Flush(); // Just purge the cache for now instead of trying to update it...
         }
 
-        private bool FillBuffer()
+        private byte[] GetCurrentPage()
         {
-            if (InsideBuffer())
-                return true;
+            var pageAddress = GetPageAddress(_position);
+            if (_pages.Count > 0 && _pages.First.Value.Address == pageAddress)
+                return _pages.First.Value.Data;
 
-            // Read the page where the position is located
-            var pageStart = _position & ~PositionMask;
-            var bytesRead = ReadMemory(BaseProcess, pageStart, _readBuffer, 0, _readBuffer.Length);
-            _bufferStart = pageStart;
-            _bufferLength = bytesRead;
-            return InsideBuffer();
+            LinkedListNode<CachedPage> node;
+            if (!_pagesByAddress.TryGetValue(pageAddress, out node))
+                return null;
+
+            // Bump the page to the front of the list because it's been used
+            _pages.Remove(node);
+            _pages.AddFirst(node);
+            return node.Value.Data;
         }
 
-        private bool InsideBuffer()
+        private byte[] LoadCurrentPage()
         {
-            return _readBuffer != null && _position >= _bufferStart && _position < _bufferStart + (ulong)_bufferLength;
+            var data = GetCurrentPage();
+            if (data != null)
+                return data;
+            var pageAddress = GetPageAddress(_position);
+            data = _pages.Count < _cacheSize ? new byte[PageSize] : EvictPage();
+            var bytesRead = ReadMemory(BaseProcess, pageAddress, data, 0, data.Length);
+            if (bytesRead == 0)
+                return null;
+            var node = _pages.AddFirst(new CachedPage(pageAddress, data));
+            _pagesByAddress[pageAddress] = node;
+            return data;
         }
 
-        private static int ToBufferPosition(ulong position)
+        private byte[] EvictPage()
         {
-            return (int)(position & PositionMask);
+            var lastPage = _pages.Last.Value; // Least recently used
+            _pages.RemoveLast();
+            _pagesByAddress.Remove(lastPage.Address);
+            return lastPage.Data;
+        }
+
+        private static ulong GetPageAddress(ulong position)
+        {
+            return position & PageIndexMask;
+        }
+
+        private static int GetPageOffset(ulong position)
+        {
+            return (int)(position & PageOffsetMask);
+        }
+
+        private class CachedPage
+        {
+            public CachedPage(ulong address, byte[] data)
+            {
+                Address = address;
+                Data = data;
+            }
+
+            public ulong Address { get; }
+            public byte[] Data { get; }
         }
 
         private static unsafe int ReadMemory(Process process, ulong address, byte[] buffer, int offset, int count)

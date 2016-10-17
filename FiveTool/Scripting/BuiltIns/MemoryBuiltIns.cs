@@ -33,7 +33,7 @@ namespace FiveTool.Scripting.BuiltIns
                 var process = GetGameProcess();
                 if (process == null)
                     return -1;
-                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process, true)))
+                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process)))
                 {
                     var tags = V7475GlobalIdMap.Read(process, memoryReader);
                     MemoryTagInfo info;
@@ -60,7 +60,7 @@ namespace FiveTool.Scripting.BuiltIns
                 var process = GetGameProcess();
                 if (process == null)
                     return table;
-                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process, true)))
+                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process)))
                 {
                     var tags = V7475GlobalIdMap.Read(process, memoryReader);
                     foreach (var pair in tags.Enumerate(memoryReader))
@@ -84,7 +84,7 @@ namespace FiveTool.Scripting.BuiltIns
                 var process = GetGameProcess();
                 if (process == null)
                     return 0;
-                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process, true)))
+                using (var memoryReader = new BinaryReader(new ProcessMemoryStream(process)))
                 {
                     var addresses = V7475TagAddressList.Read(process, memoryReader);
                     ulong address;
