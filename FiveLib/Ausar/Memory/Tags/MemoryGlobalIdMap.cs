@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using FiveLib.Ausar.Memory.Stl;
 using FiveLib.Common;
+using FiveLib.IO;
 
 namespace FiveLib.Ausar.Memory.Tags
 {
@@ -11,18 +12,9 @@ namespace FiveLib.Ausar.Memory.Tags
     /// <summary>
     /// An in-memory hash map which maps global IDs to tag information.
     /// </summary>
-    public class MemoryGlobalIdMap: IBinaryReadable, IBinaryWritable, IBinaryStruct
+    public class MemoryGlobalIdMap: IBinarySerializable, IFixedSize
     {
-        private readonly GlobalIdHashTable _hashTable = new GlobalIdHashTable();
-
-        public MemoryGlobalIdMap()
-        {
-        }
-
-        public MemoryGlobalIdMap(BinaryReader reader)
-        {
-            Read(reader);
-        }
+        private GlobalIdHashTable _hashTable = new GlobalIdHashTable();
 
         public ulong Count => _hashTable.Count;
 
@@ -44,9 +36,7 @@ namespace FiveLib.Ausar.Memory.Tags
             return _hashTable.Enumerate(reader).Select(p => new KeyValuePair<uint, MemoryTagInfo>(p.Key.Value, p.Value));
         }
 
-        public void Read(BinaryReader reader) => _hashTable.Read(reader);
-
-        public void Write(BinaryWriter writer) => _hashTable.Write(writer);
+        public void Serialize(BinarySerializer s) => s.Object(ref _hashTable);
 
         public ulong GetStructSize() => _hashTable.GetStructSize();
 

@@ -5,15 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Common;
+using FiveLib.IO;
 
 namespace FiveLib.Ausar.Memory.Stl
 {
     /// <summary>
     /// Memory interface for std::pair.
     /// </summary>
-    public class StlPair<TFirst, TSecond> : IBinaryReadable, IBinaryWritable, IBinaryStruct
-        where TFirst: IBinaryReadable, IBinaryWritable, IBinaryStruct, new()
-        where TSecond: IBinaryReadable, IBinaryWritable, IBinaryStruct, new()
+    public class StlPair<TFirst, TSecond> : IBinarySerializable, IFixedSize
+        where TFirst: IBinarySerializable, IFixedSize, new()
+        where TSecond: IBinarySerializable, IFixedSize, new()
     {
         public StlPair()
         {
@@ -25,28 +26,17 @@ namespace FiveLib.Ausar.Memory.Stl
         {
             First = first;
             Second = second;
-        } 
-         
-        public TFirst First { get; set; }
-
-        public TSecond Second { get; set; }
-
-        public void Read(BinaryReader reader)
-        {
-            First = new TFirst();
-            Second = new TSecond();
-            First.Read(reader);
-            reader.BaseStream.Position += GetPadding(First.GetStructSize());
-            Second.Read(reader);
-            reader.BaseStream.Position += GetPadding(Second.GetStructSize());
         }
 
-        public void Write(BinaryWriter writer)
+        public TFirst First;
+        public TSecond Second;
+
+        public void Serialize(BinarySerializer s)
         {
-            First.Write(writer);
-            writer.BaseStream.Position += GetPadding(First.GetStructSize());
-            Second.Write(writer);
-            writer.BaseStream.Position += GetPadding(Second.GetStructSize());
+            s.Object(ref First);
+            s.Padding(GetPadding(First.GetStructSize()));
+            s.Object(ref Second);
+            s.Padding(GetPadding(Second.GetStructSize()));
         }
 
         public ulong GetStructSize()
@@ -61,9 +51,9 @@ namespace FiveLib.Ausar.Memory.Stl
             return AlignmentUtil.Align(size, GetStructAlignment());
         }
 
-        private long GetPadding(ulong size)
+        private int GetPadding(ulong size)
         {
-            return (long)(AlignSize(size) - size);
+            return (int)(AlignSize(size) - size);
         }
     }
 }

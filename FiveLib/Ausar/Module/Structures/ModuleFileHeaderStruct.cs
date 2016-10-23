@@ -5,64 +5,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Common;
+using FiveLib.IO;
 
 namespace FiveLib.Ausar.Module.Structures
 {
-    internal class ModuleFileHeaderStruct
+    internal class ModuleFileHeaderStruct : IBinarySerializable
     {
         public static readonly MagicNumber ExpectedMagic = new MagicNumber("dhom");
         public const int ExpectedVersion = 27;
 
-        public MagicNumber Magic { get; set; } = ExpectedMagic;
+        public MagicNumber Magic = ExpectedMagic;
+        public int Version = ExpectedVersion;
+        public ulong Id;
+        public int FileCount;
+        public int LoadedTagCount;
+        public int FirstResourceIndex;
+        public uint StringTableSize;
+        public int ResourceCount;
+        public int DataBlockCount;
+        public ulong BuildVersionId;
+        public ulong HeaderChecksum;
 
-        public int Version { get; set; } = ExpectedVersion;
-
-        public ulong Id { get; set; }
-
-        public int FileCount { get; set; }
-
-        public int LoadedTagCount { get; set; }
-
-        public int FirstResourceIndex { get; set; }
-
-        public uint StringTableSize { get; set; }
-
-        public int ResourceCount { get; set; }
-
-        public int DataBlockCount { get; set; }
-
-        public ulong BuildVersionId { get; set; }
-
-        public ulong HeaderChecksum { get; set; }
-
-        public void Read(BinaryReader reader)
+        public void Serialize(BinarySerializer s)
         {
-            Magic = new MagicNumber(reader.ReadInt32());
-            Version = reader.ReadInt32();
-            Id = reader.ReadUInt64();
-            FileCount = reader.ReadInt32();
-            LoadedTagCount = reader.ReadInt32();
-            FirstResourceIndex = reader.ReadInt32();
-            StringTableSize = reader.ReadUInt32();
-            ResourceCount = reader.ReadInt32();
-            DataBlockCount = reader.ReadInt32();
-            BuildVersionId = reader.ReadUInt64();
-            HeaderChecksum = reader.ReadUInt64();
-        }
-
-        public void Write(BinaryWriter writer)
-        {
-            writer.Write(Magic.Value);
-            writer.Write(Version);
-            writer.Write(Id);
-            writer.Write(FileCount);
-            writer.Write(LoadedTagCount);
-            writer.Write(FirstResourceIndex);
-            writer.Write(StringTableSize);
-            writer.Write(ResourceCount);
-            writer.Write(DataBlockCount);
-            writer.Write(BuildVersionId);
-            writer.Write(HeaderChecksum);
+            s.Expect(ss => ss.Value(ref Magic), nameof(Magic), ExpectedMagic);
+            s.Expect(ss => ss.Value(ref Version), nameof(Version), ExpectedVersion);
+            s.Value(ref Id);
+            s.Value(ref FileCount);
+            s.Value(ref LoadedTagCount);
+            s.Value(ref FirstResourceIndex);
+            s.Value(ref StringTableSize);
+            s.Value(ref ResourceCount);
+            s.Value(ref DataBlockCount);
+            s.Value(ref BuildVersionId);
+            s.Value(ref HeaderChecksum);
         }
     }
 }

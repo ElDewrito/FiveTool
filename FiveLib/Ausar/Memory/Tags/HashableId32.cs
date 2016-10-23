@@ -2,13 +2,14 @@
 using System.IO;
 using FiveLib.Ausar.Memory.Stl;
 using FiveLib.Common;
+using FiveLib.IO;
 
 namespace FiveLib.Ausar.Memory.Tags
 {
     /// <summary>
     /// A 32-bit ID value which can be hashed with FNV-1a.
     /// </summary>
-    public class HashableId32 : IBinaryReadable, IBinaryWritable, IBinaryStruct
+    public class HashableId32 : IBinarySerializable, IFixedSize
     {
         public HashableId32()
         {
@@ -19,16 +20,11 @@ namespace FiveLib.Ausar.Memory.Tags
             Value = value;
         }
 
-        public uint Value { get; set; }
+        public uint Value;
 
-        public void Read(BinaryReader reader)
+        public void Serialize(BinarySerializer s)
         {
-            Value = reader.ReadUInt32();
-        }
-
-        public void Write(BinaryWriter writer)
-        {
-            writer.Write(Value);
+            s.Value(ref Value);
         }
 
         public ulong GetStructSize() => 4;

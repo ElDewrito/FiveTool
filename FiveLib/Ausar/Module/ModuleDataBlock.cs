@@ -28,7 +28,7 @@ namespace FiveLib.Ausar.Module
             CompressedSize = data.CompressedSize;
             UncompressedOffset = data.UncompressedOffset;
             UncompressedSize = data.UncompressedSize;
-            IsCompressed = data.IsCompressed;
+            IsCompressed = data.Compression != 0;
         }
     }
 }

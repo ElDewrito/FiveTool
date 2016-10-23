@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Memory.Tags;
+using FiveLib.IO;
 
 namespace FiveLib.Ausar.Memory.V7475
 {
@@ -17,7 +18,9 @@ namespace FiveLib.Ausar.Memory.V7475
             reader.BaseStream.Position = (long)process.MainModule.BaseAddress + 0x5961180;
             reader.BaseStream.Position = reader.ReadInt64() + 8;
             reader.BaseStream.Position = reader.ReadInt64() + 0x98;
-            return new MemoryGlobalIdMap(reader);
+            var map = new MemoryGlobalIdMap();
+            map.Serialize(new BinarySerializer(reader));
+            return map;
         }
     }
 }

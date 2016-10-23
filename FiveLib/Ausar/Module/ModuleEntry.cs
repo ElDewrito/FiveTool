@@ -102,7 +102,7 @@ namespace FiveLib.Ausar.Module
             {
                 for (var i = 0; i < data.BlockCount; i++)
                 {
-                    var block = module.CompressedBlocks[data.FirstBlockIndex + i];
+                    var block = module.DataBlocks[data.FirstBlockIndex + i];
                     blocks.Add(new ModuleDataBlock(block));
                 }
             }
@@ -114,7 +114,7 @@ namespace FiveLib.Ausar.Module
                     Checksum = data.AssetChecksum,
                     CompressedOffset = 0,
                     CompressedSize = data.TotalCompressedSize,
-                    IsCompressed = (data.Flags & ModuleEntryFlags.Compressed) != 0,
+                    Compression = (data.Flags & ModuleEntryFlags.Compressed) != 0 ? 1 : 0,
                     UncompressedOffset = 0,
                     UncompressedSize = data.TotalUncompressedSize,
                 };

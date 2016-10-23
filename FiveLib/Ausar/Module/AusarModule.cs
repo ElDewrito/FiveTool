@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Ausar.Module.Structures;
+using FiveLib.IO;
 
 namespace FiveLib.Ausar.Module
 {
@@ -127,11 +128,10 @@ namespace FiveLib.Ausar.Module
         public static AusarModule Create(Stream stream)
         {
             // NOTE: Untested
-            var header = new ModuleFileHeaderStruct();
-            var writer = new BinaryWriter(stream, Encoding.UTF8, /* leaveOpen */ true);
-            header.Write(writer);
+            var moduleStruct = new ModuleStruct();
+            BinarySerializer.Serialize(stream, moduleStruct);
             var dataBaseOffset = stream.Position;
-            return new AusarModule(dataBaseOffset, header, Enumerable.Empty<ModuleEntry>());
+            return new AusarModule(dataBaseOffset, moduleStruct.FileHeader, Enumerable.Empty<ModuleEntry>());
         }
 
         /// <summary>
@@ -141,9 +141,7 @@ namespace FiveLib.Ausar.Module
         /// <returns>The opened module.</returns>
         public static AusarModule Open(Stream stream)
         {
-            var reader = new BinaryReader(stream, Encoding.UTF8, /* leaveOpen */ true);
-            var moduleStruct = new ModuleStruct();
-            moduleStruct.Read(reader);
+            var moduleStruct = BinarySerializer.Deserialize<ModuleStruct>(stream);
             var entries = moduleStruct.Entries.Select((e, i) => new ModuleEntry(i, e, moduleStruct)).ToList();
             var resources = moduleStruct.ResourceEntries.Select(i => entries[i]).ToList();
             for (var i = 0; i < moduleStruct.Entries.Length; i++)
@@ -159,10 +157,8 @@ namespace FiveLib.Ausar.Module
         /// <returns>The module's ID number.</returns>
         public static ulong ReadId(Stream stream)
         {
-            var reader = new BinaryReader(stream, Encoding.UTF8, /* leaveOpen */ true);
-            var headerStruct = new ModuleFileHeaderStruct();
-            headerStruct.Read(reader);
-            return headerStruct.Id;
+            var header = BinarySerializer.Deserialize<ModuleFileHeaderStruct>(stream);
+            return header.Id;
         }
     }
 }

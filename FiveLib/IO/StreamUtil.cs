@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Text;
 
-namespace FiveLib.Common
+namespace FiveLib.IO
 {
     internal static class StreamUtil
     {
@@ -121,7 +120,7 @@ namespace FiveLib.Common
             if (size < 0)
                 throw new ArgumentException("The size of the data to insert must be >= 0");
 
-            const int bufferSize = 0x1000;
+            var bufferSize = Math.Min(size, 0x1000);
             var buffer = new byte[bufferSize];
             var pos = stream.Position;
             var endPos = pos + size;

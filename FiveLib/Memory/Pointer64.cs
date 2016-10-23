@@ -1,15 +1,13 @@
 ﻿using System.IO;
-using FiveLib.Common;
+using FiveLib.IO;
 
 namespace FiveLib.Memory
 {
     /// <summary>
     /// A 64-bit memory address which points to serializable binary data.
     /// </summary>
-    /// <seealso cref="FiveLib.Common.IBinaryWritable" />
-    /// <seealso cref="FiveLib.Common.IBinaryStruct" />
-    public struct Pointer64<T> : IBinaryWritable, IBinaryStruct
-        where T: IBinaryReadable, IBinaryWritable, IBinaryStruct, new()
+    public struct Pointer64<T> : IFixedSize
+        where T: IBinarySerializable, IFixedSize, new()
     {
         public static readonly Pointer64<T> Null = new Pointer64<T>(0); 
 
@@ -24,7 +22,7 @@ namespace FiveLib.Memory
         {
             var result = new T();
             reader.BaseStream.Position = (long)Address;
-            result.Read(reader);
+            result.Serialize(new BinarySerializer(reader));
             return result;
         }
 
@@ -32,30 +30,25 @@ namespace FiveLib.Memory
         {
             var result = new T();
             reader.BaseStream.Position = (long)(Address + index * result.GetStructSize());
-            result.Read(reader);
+            result.Serialize(new BinarySerializer(reader));
             return result;
         }
 
         public void Set(T newValue, BinaryWriter writer)
         {
             writer.BaseStream.Position = (long)Address;
-            newValue.Write(writer);
+            newValue.Serialize(new BinarySerializer(writer));
         }
 
         public void Set(ulong index, T newValue, BinaryWriter writer)
         {
             writer.BaseStream.Position = (long)(Address + index * newValue.GetStructSize());
-            newValue.Write(writer);
+            newValue.Serialize(new BinarySerializer(writer));
         }
 
         public static Pointer64<T> Read(BinaryReader reader)
         {
             return new Pointer64<T>(reader.ReadUInt64());
-        } 
-
-        public void Write(BinaryWriter writer)
-        {
-            writer.Write(Address);
         }
 
         public ulong GetStructSize() => 8;
@@ -91,7 +84,7 @@ namespace FiveLib.Memory
         /// Wraps a <see cref="Pointer64{T}"/> so that it is mutable.
         /// Useful for pointers which point to other pointers.
         /// </summary>
-        public class Wrapper : IBinaryReadable, IBinaryWritable, IBinaryStruct
+        public class Wrapper : IBinarySerializable, IFixedSize
         {
             public Wrapper()
             {
@@ -103,23 +96,18 @@ namespace FiveLib.Memory
                 Pointer = pointer;
             }
 
-            public Pointer64<T> Pointer { get; set; }
-
-            public void Read(BinaryReader reader)
-            {
-                Pointer = Pointer64<T>.Read(reader);
-            }
-
-            public void Write(BinaryWriter writer)
-            {
-                Pointer.Write(writer);
-            }
+            public Pointer64<T> Pointer;
 
             public ulong GetStructSize() => Pointer.GetStructSize();
 
             public ulong GetStructAlignment() => Pointer.GetStructAlignment();
 
             public override string ToString() => Pointer.ToString();
+
+            public void Serialize(BinarySerializer s)
+            {
+                s.Value(ref Pointer);
+            }
         }
     }
 }

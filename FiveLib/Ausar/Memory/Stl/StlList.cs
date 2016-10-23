@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FiveLib.Common;
+using FiveLib.IO;
 using FiveLib.Memory;
 
 namespace FiveLib.Ausar.Memory.Stl
@@ -12,12 +12,11 @@ namespace FiveLib.Ausar.Memory.Stl
     /// <summary>
     /// Memory interface for std::list.
     /// </summary>
-    public class StlList<T> : IBinaryReadable, IBinaryWritable, IBinaryStruct
-        where T: IBinaryReadable, IBinaryWritable, IBinaryStruct, new()
+    public class StlList<T> : IBinarySerializable, IFixedSize
+        where T: IBinarySerializable, IFixedSize, new()
     {
-        public Pointer64<Node> End { get; set; } = Pointer64<Node>.Null; 
-
-        public ulong Count { get; set; }
+        public Pointer64<Node> End = Pointer64<Node>.Null;
+        public ulong Count;
 
         public Pointer64<Node> GetBegin(BinaryReader reader)
         {
@@ -33,45 +32,29 @@ namespace FiveLib.Ausar.Memory.Stl
                 yield return nodeData;
                 currentNode = nodeData.Next;
             }
-        } 
-
-        public void Read(BinaryReader reader)
-        {
-            End = Pointer64<Node>.Read(reader);
-            Count = reader.ReadUInt64();
         }
 
-        public void Write(BinaryWriter writer)
+        public void Serialize(BinarySerializer s)
         {
-            End.Write(writer);
-            writer.Write(Count);
+            s.Value(ref End);
+            s.Value(ref Count);
         }
 
         public ulong GetStructSize() => 0x10;
 
         public ulong GetStructAlignment() => 0x8;
 
-        public class Node : IBinaryReadable, IBinaryWritable, IBinaryStruct
+        public class Node : IBinarySerializable, IFixedSize
         {
-            public Pointer64<Node> Next { get; set; } = Pointer64<Node>.Null;
+            public Pointer64<Node> Next = Pointer64<Node>.Null;
+            public Pointer64<Node> Previous = Pointer64<Node>.Null;
+            public T Data;
 
-            public Pointer64<Node> Previous { get; set; } = Pointer64<Node>.Null;
-
-            public T Data { get; set; }
-
-            public void Read(BinaryReader reader)
+            public void Serialize(BinarySerializer s)
             {
-                Next = Pointer64<Node>.Read(reader);
-                Previous = Pointer64<Node>.Read(reader);
-                Data = new T();
-                Data.Read(reader);
-            }
-
-            public void Write(BinaryWriter writer)
-            {
-                Next.Write(writer);
-                Previous.Write(writer);
-                Data.Write(writer);
+                s.Value(ref Next);
+                s.Value(ref Previous);
+                s.Object(ref Data);
             }
 
             public ulong GetStructSize() => 0x10 + Data.GetStructSize();

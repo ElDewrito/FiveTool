@@ -2,6 +2,7 @@
 using System.IO;
 using FiveLib.Ausar.Module.Structures;
 using FiveLib.Common;
+using FiveLib.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FiveLib.Tests.Ausar.Module.Structures
@@ -21,10 +22,10 @@ namespace FiveLib.Tests.Ausar.Module.Structures
         public void TestReadingDummyHeader()
         {
             var header = new ModuleFileHeaderStruct();
-            using (var reader = new BinaryReader(new MemoryStream(DummyHeaderBytes)))
+            using (var serializer = new BinarySerializer(new BinaryReader(new MemoryStream(DummyHeaderBytes))))
             {
-                header.Read(reader);
-                Assert.AreEqual(DummyHeaderBytes.Length, reader.BaseStream.Position);
+                header.Serialize(serializer);
+                Assert.AreEqual(DummyHeaderBytes.Length, serializer.BaseStream.Position);
             }
 
             Assert.AreEqual(new MagicNumber("dhom"), header.Magic);
@@ -61,9 +62,9 @@ namespace FiveLib.Tests.Ausar.Module.Structures
             byte[] writtenBytes;
             using (var stream = new MemoryStream())
             {
-                using (var writer = new BinaryWriter(stream))
+                using (var serializer = new BinarySerializer(new BinaryWriter(stream)))
                 {
-                    header.Write(writer);
+                    header.Serialize(serializer);
                     writtenBytes = new byte[stream.Length];
                     Buffer.BlockCopy(stream.GetBuffer(), 0, writtenBytes, 0, writtenBytes.Length);
                 }

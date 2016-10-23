@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FiveLib.Common;
+using FiveLib.IO;
 using FiveLib.Memory;
 
 namespace FiveLib.Ausar.Memory.Stl
@@ -12,21 +13,19 @@ namespace FiveLib.Ausar.Memory.Stl
     /// <summary>
     /// Memory interface for std::vector.
     /// </summary>
-    public class StlVector<T> : IBinaryReadable, IBinaryWritable, IBinaryStruct
-        where T: IBinaryReadable, IBinaryWritable, IBinaryStruct, new()
+    public class StlVector<T> : IBinarySerializable, IFixedSize
+        where T: IBinarySerializable, IFixedSize, new()
     {
         private readonly ulong _elementSize;
 
         public StlVector()
         {
             _elementSize = new T().GetStructSize(); // TODO: is there any way to make this not suck?
-        } 
+        }
 
-        public Pointer64<T> First { get; set; } = Pointer64<T>.Null;
-
-        public Pointer64<T> Last { get; set; } = Pointer64<T>.Null;
-
-        public Pointer64<T> End { get; set; } = Pointer64<T>.Null;
+        public Pointer64<T> First = Pointer64<T>.Null;
+        public Pointer64<T> Last = Pointer64<T>.Null;
+        public Pointer64<T> End = Pointer64<T>.Null;
 
         public T Get(ulong index, BinaryReader reader)
         {
@@ -46,18 +45,11 @@ namespace FiveLib.Ausar.Memory.Stl
 
         public ulong Capacity => (End.Address - First.Address) / _elementSize;
 
-        public void Read(BinaryReader reader)
+        public void Serialize(BinarySerializer s)
         {
-            First = Pointer64<T>.Read(reader);
-            Last = Pointer64<T>.Read(reader);
-            End = Pointer64<T>.Read(reader);
-        }
-
-        public void Write(BinaryWriter writer)
-        {
-            First.Write(writer);
-            Last.Write(writer);
-            End.Write(writer);
+            s.Value(ref First);
+            s.Value(ref Last);
+            s.Value(ref End);
         }
 
         public ulong GetStructSize() => 0xC;
