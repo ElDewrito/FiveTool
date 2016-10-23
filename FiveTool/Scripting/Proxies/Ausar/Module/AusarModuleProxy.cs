@@ -33,6 +33,11 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
 
         public long DataBaseOffset => _module.DataBaseOffset;
 
+        public bool ContainsEntry(ModuleEntry entry)
+        {
+            return _module.ContainsEntry(entry);
+        }
+
         public ModuleEntry GetEntryByName(string name)
         {
             ModuleEntry result;
@@ -45,6 +50,16 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             ModuleEntry result;
             _module.GetEntryByGlobalTagId(id, out result);
             return result;
+        }
+
+        public void ExtractEntry(ModuleEntry entry, string path, string sectionName)
+        {
+            if (!_module.ContainsEntry(entry))
+                throw new ScriptRuntimeException("Entry is not contained inside the module");
+            path = FileSandbox.ResolvePath(path);
+            var section = TranslateSection(sectionName);
+            using (var stream = _file.OpenRead())
+                _module.ExtractEntry(stream, entry, section, path);
         }
 
         public static AusarModuleProxy LoadFromFile(string path)
@@ -60,6 +75,25 @@ namespace FiveTool.Scripting.Proxies.Ausar.Module
             path = FileSandbox.ResolvePath(path);
             using (var stream = File.OpenRead(path))
                 return new UInt64Proxy(AusarModule.ReadId(stream));
+        }
+
+        private static ModuleEntrySection TranslateSection(string sectionName)
+        {
+            if (sectionName == null)
+                return ModuleEntrySection.All;
+            switch (sectionName.ToUpperInvariant())
+            {
+                case "HEADER":
+                    return ModuleEntrySection.Header;
+                case "TAG":
+                    return ModuleEntrySection.TagData;
+                case "RESOURCE":
+                    return ModuleEntrySection.ResourceData;
+                case "ALL":
+                    return ModuleEntrySection.All;
+                default:
+                    throw new ScriptRuntimeException($"Unsupported module entry section \"${sectionName}\"");
+            }
         }
 
         public override string ToString() => $"(AusarModule, {Entries.Count} entries)";

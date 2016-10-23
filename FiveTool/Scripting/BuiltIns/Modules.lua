@@ -1,6 +1,8 @@
 ﻿local loadedModules = {} -- Modules keyed by ID string
 
-function LoadModule (path)
+local GetModuleFromEntry
+
+function LoadModule(path)
 	if path == nil then
 		path = ChooseFile("module", "Open Module File")
 		if path == nil then
@@ -14,7 +16,7 @@ function LoadModule (path)
 	return loadedModules[id]
 end
 
-DefineHelp ("Module", "LoadModule", {
+DefineHelp("Module", "LoadModule", {
 	shortDescription = "Load a module file",
 	longDescription = "Loads a module file.\nIts contents will be made accessible to other functions.\nIf a path is not provided, the user will be asked to browse for one.",
 	args = {
@@ -26,7 +28,7 @@ DefineHelp ("Module", "LoadModule", {
 	},
 });
 
-function GetModuleEntry (nameOrId)
+function GetModuleEntry(nameOrId)
 	for id, module in pairs(loadedModules) do
 		local entry
 		if type(nameOrId) == "number" then
@@ -41,7 +43,7 @@ function GetModuleEntry (nameOrId)
 	return nil
 end
 
-DefineHelp ("Module", "GetModuleEntry", {
+DefineHelp("Module", "GetModuleEntry", {
 	shortDescription = "Look up a module entry by name or global ID",
 	longDescription = "Looks up a module entry by name or global ID.\nIf a name is supplied, it must match exactly.",
 	args = {
@@ -54,7 +56,7 @@ DefineHelp ("Module", "GetModuleEntry", {
 	},
 });
 
-function FindModuleEntry (name)
+function FindModuleEntry(name)
 	for id, module in pairs(loadedModules) do
 		for i, entry in ipairs(module.Entries) do
 			if string.find(entry.Name, name, 1, true) ~= nil then
@@ -65,7 +67,7 @@ function FindModuleEntry (name)
 	return nil
 end
 
-DefineHelp ("Module", "FindModuleEntry", {
+DefineHelp("Module", "FindModuleEntry", {
 	shortDescription = "Find the first module entry matching a string",
 	longDescription = "Finds the first module entry matching a string.\nThe string can be anywhere in an entry's name.",
 	returns = "The module entry object if found, or nil otherwise.",
@@ -77,7 +79,7 @@ DefineHelp ("Module", "FindModuleEntry", {
 	},
 });
 
-function FindModuleEntries (name)
+function FindModuleEntries(name)
 	local entries = {}
 	for id, module in pairs(loadedModules) do
 		for i, entry in ipairs(module.Entries) do
@@ -89,7 +91,7 @@ function FindModuleEntries (name)
 	return entries
 end
 
-DefineHelp ("Module", "FindModuleEntries", {
+DefineHelp("Module", "FindModuleEntries", {
 	shortDescription = "Find all module entries matching a string",
 	longDescription = "Finds all module entries matching a string.\nThe string can be anywhere in an entry's name.",
 	returns = "An array of all found entries.",
@@ -100,3 +102,53 @@ DefineHelp ("Module", "FindModuleEntries", {
 		"bipeds = FindModuleEntries(\".biped\")",
 	},
 });
+
+function ExtractModuleEntry(entry, path, section)
+	if type(entry) ~= "userdata" then
+		entry = GetModuleEntry(entry)
+		if entry == nil then
+			return false
+		end
+	end
+	module = GetModuleFromEntry(entry)
+	if module == nil then
+		return false
+	end
+	if path == nil then
+		path = ChooseNewFile()
+		if path == nil then
+			return false
+		end
+	end
+	if section == nil then
+		section = "all"
+	end
+	module.ExtractEntry(entry, path, section)
+	return true
+end
+
+DefineHelp("Module", "ExtractModuleEntry", {
+	shortDescription = "Extract an entry from a module",
+	longDescription = "Extracts all or part of an entry from a module.\nThe module must have been loaded with LoadModule().",
+	returns = "false if the entry was not found or a path was not selected, true otherwise",
+	args = {
+		{ "entry", "The name, global ID, or entry object of the entry to extract" },
+		{ "path", "(Optional) The relative path or path token to extract the entry to" },
+		{ "section", "(Optional) The section to extract (header|tag|resource|all)" },
+	},
+	examples = {
+		"ExtractModuleEntry(0x8595)",
+		"ExtractModuleEntry(0x8595, \"assault_rifle.weapon\")",
+		"ExtractModuleEntry(0x8595, \"assault_rifle.header.bin\", \"header\")",
+	},
+})
+
+GetModuleFromEntry = function (entry)
+	-- does this need to be faster?
+	for id, module in pairs(loadedModules) do
+		if module.ContainsEntry(entry) then
+			return module
+		end
+	end
+	return nil
+end
