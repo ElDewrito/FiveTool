@@ -26,9 +26,14 @@ DefineHelp ("Module", "LoadModule", {
 	},
 });
 
-function GetModuleEntry (name)
+function GetModuleEntry (nameOrId)
 	for id, module in pairs(loadedModules) do
-		local entry = module.GetEntryByName(name)
+		local entry
+		if type(nameOrId) == "number" then
+			entry = module.GetEntryByGlobalTagId(nameOrId)
+		else
+			entry = module.GetEntryByName(nameOrId)
+		end
 		if entry ~= nil then
 			return entry
 		end
@@ -37,14 +42,15 @@ function GetModuleEntry (name)
 end
 
 DefineHelp ("Module", "GetModuleEntry", {
-	shortDescription = "Look up a module entry by name",
-	longDescription = "Looks up a module entry by name.\nThe name must match exactly.",
+	shortDescription = "Look up a module entry by name or global ID",
+	longDescription = "Looks up a module entry by name or global ID.\nIf a name is supplied, it must match exactly.",
 	args = {
-		{ "name", "The full name of the entry to get" },
+		{ "nameOrId", "The full name or global ID of the entry to get" },
 	},
-	returns = "The module entry object if it exists, or nil otherwise.",
+	returns = "The module entry object if it is loaded, or nil otherwise.",
 	examples = {
 		"ar = GetModuleEntry([[objects\\weapons\\rifle\\storm_assault_rifle\\storm_assault_rifle.weapon]])",
+		"ar = GetModuleEntry(0x8595)",
 	},
 });
 
