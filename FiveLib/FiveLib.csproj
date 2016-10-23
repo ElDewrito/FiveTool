@@ -61,6 +61,7 @@
     <Compile Include="Ausar\Memory\Tags\MemoryGlobalIdMap.cs" />
     <Compile Include="Ausar\Memory\V7475\V7475GlobalIdMap.cs" />
     <Compile Include="Ausar\Memory\V7475\V7475TagAddressList.cs" />
+    <Compile Include="Ausar\Module\ModuleEntrySection.cs" />
     <Compile Include="Common\AlignmentUtil.cs" />
     <Compile Include="IO\BinarySerializer.cs" />
     <Compile Include="IO\IBinarySerializable.cs" />

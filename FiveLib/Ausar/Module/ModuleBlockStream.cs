@@ -13,18 +13,26 @@ namespace FiveLib.Ausar.Module
         private readonly ModuleBlockCompressor _blockCompressor;
         private readonly List<ModuleDataBlock> _blocks; // Sorted by uncompressed offset for quick seeking
         private readonly long _entryOffset;
-        private readonly long _length;
+        private readonly long _sectionOffset; // Offset of the section relative to the start of the entry
+        private readonly long _sectionLength;
 
-        private long _position;
+        private long _sectionPosition; // Position relative to the start of the section
+        private long _entryPosition; // Position relative to the start of the entry
         private ModuleDataBlock _currentBlock; // Can be null
         private MemoryStream _currentBlockStream; // Can be null
 
-        public ModuleBlockStream(ModuleBlockCompressor blockCompressor, ModuleEntry entry)
+        public ModuleBlockStream(ModuleBlockCompressor blockCompressor, ModuleEntry entry, ModuleEntrySection section)
         {
             _blockCompressor = blockCompressor;
-            _blocks = entry.Blocks.OrderBy(b => b.UncompressedOffset).ToList();
             _entryOffset = entry.DataOffset;
-            _length = entry.TotalUncompressedSize;
+            _blocks = GetBlocks(entry, section);
+            if (_blocks.Count > 0)
+            {
+                _sectionOffset = _blocks[0].UncompressedOffset;
+                _entryPosition = _sectionOffset;
+                var lastBlock = _blocks[_blocks.Count - 1];
+                _sectionLength = lastBlock.UncompressedOffset + lastBlock.UncompressedSize - _sectionOffset;
+            }
         }
          
         protected override void Dispose(bool disposing)
@@ -67,7 +75,7 @@ namespace FiveLib.Ausar.Module
             var bytesRemaining = count;
             while (bytesRemaining > 0 && LoadBlock())
             {
-                _currentBlockStream.Position = Position - _currentBlock.UncompressedOffset;
+                _currentBlockStream.Position = _entryPosition - _currentBlock.UncompressedOffset;
                 var bytesRead = _currentBlockStream.Read(buffer, offset + totalBytesRead, bytesRemaining);
                 totalBytesRead += bytesRead;
                 Position += bytesRead;
@@ -84,25 +92,28 @@ namespace FiveLib.Ausar.Module
         public override bool CanRead => true;
         public override bool CanSeek => true;
         public override bool CanWrite => false;
-        public override long Length => _length;
+        public override long Length => _sectionLength;
 
         public override long Position
         {
-            get { return _position; }
+            get { return _sectionPosition; }
             set
             {
                 if (value < 0)
                     throw new ArgumentOutOfRangeException(nameof(value), "Stream position must be non-negative");
-                _position = value;
+                _sectionPosition = value;
+                _entryPosition = _sectionOffset + _sectionPosition;
             }
         }
 
         private bool LoadBlock()
         {
-            if (_currentBlock != null && IsInBlock(Position, _currentBlock))
+            if (_blocks.Count == 0)
+                return false;
+            if (_currentBlock != null && IsInBlock(_entryPosition, _currentBlock))
                 return true;
             CloseBlock();
-            var index = FindBlock(_blocks, Position);
+            var index = FindBlock(_blocks, _entryPosition);
             if (index < 0)
                 return false;
             var block = _blocks[index];
@@ -112,6 +123,39 @@ namespace FiveLib.Ausar.Module
             _currentBlockStream = blockStream;
             return true;
         }
+
+        private static List<ModuleDataBlock> GetBlocks(ModuleEntry entry, ModuleEntrySection section)
+        {
+            if (entry.IsRawFile && section != ModuleEntrySection.All)
+                throw new ArgumentException($"Raw module entries cannot be accessed per-section");
+            int start, count;
+            switch (section)
+            {
+                case ModuleEntrySection.Header:
+                    start = 0;
+                    count = entry.HeaderBlockCount;
+                    break;
+                case ModuleEntrySection.TagData:
+                    start = entry.HeaderBlockCount;
+                    count = entry.TagDataBlockCount;
+                    break;
+                case ModuleEntrySection.ResourceData:
+                    start = entry.HeaderBlockCount + entry.TagDataBlockCount;
+                    count = entry.ResourceBlockCount;
+                    break;
+                case ModuleEntrySection.All:
+                    start = 0;
+                    count = entry.Blocks.Count;
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported module entry section {section}", nameof(section));
+            }
+            return entry.Blocks
+                .Skip(start)
+                .Take(count)
+                .OrderBy(b => b.UncompressedOffset)
+                .ToList();
+        } 
 
         private static int FindBlock(IList<ModuleDataBlock> blocks, long position)
         {

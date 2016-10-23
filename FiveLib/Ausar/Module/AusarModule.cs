@@ -60,6 +60,42 @@ namespace FiveLib.Ausar.Module
         public long DataBaseOffset { get; }
 
         /// <summary>
+        /// Checks if a <see cref="ModuleEntry"/> belongs to this module.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <returns><c>true</c> if the entry belongs to this module.</returns>
+        public bool ContainsEntry(ModuleEntry entry)
+        {
+            if (entry.Index < 0 || entry.Index >= _entries.Count)
+                return false;
+            return _entries[entry.Index] == entry;
+        }
+
+        /// <summary>
+        /// Checks if this module contains an entry with a given name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns><c>true</c> if this module contains an entry with the given name.</returns>
+        public bool ContainsEntry(string name)
+        {
+            ModuleEntry entry;
+            return _entriesByName.TryGetValue(name, out entry);
+        }
+
+        /// <summary>
+        /// Checks if this module contains an entry with a given global ID.
+        /// </summary>
+        /// <param name="globalId">The global ID.</param>
+        /// <returns><c>true</c> if this module contains an entry with the given global ID.</returns>
+        public bool ContainsEntry(uint globalId)
+        {
+            if (globalId == 0xFFFFFFFF)
+                return false;
+            ModuleEntry entry;
+            return _entriesByGlobalTagId.TryGetValue(globalId, out entry);
+        }
+
+        /// <summary>
         /// Looks up an entry by its filename.
         /// </summary>
         /// <param name="name">The filename to search for.</param>
@@ -86,22 +122,26 @@ namespace FiveLib.Ausar.Module
         /// </summary>
         /// <param name="moduleStream">A stream open on the module file.</param>
         /// <param name="entry">The entry.</param>
-        /// <returns>A stream which can be used to read the entry data.</returns>
-        public ModuleBlockStream OpenEntry(Stream moduleStream, ModuleEntry entry)
+        /// <param name="section">The section to open.</param>
+        /// <returns>A stream which can be used to read the entry data. It will depend on <paramref name="moduleStream"/>.</returns>
+        public ModuleBlockStream OpenEntry(Stream moduleStream, ModuleEntry entry, ModuleEntrySection section)
         {
+            AssertContainsEntry(entry);
             var blockCompressor = new ModuleBlockCompressor(moduleStream, DataBaseOffset);
-            return new ModuleBlockStream(blockCompressor, entry);
+            return new ModuleBlockStream(blockCompressor, entry, section);
         }
 
         /// <summary>
-        /// Extracts an entire entry to a stream.
+        /// Extracts all or part of an entry to a stream.
         /// </summary>
         /// <param name="moduleStream">A stream open on the module file.</param>
         /// <param name="entry">The entry.</param>
+        /// <param name="section">The section to extract.</param>
         /// <param name="outStream">The stream to extract to.</param>
-        public void ExtractEntry(Stream moduleStream, ModuleEntry entry, Stream outStream)
+        public void ExtractEntry(Stream moduleStream, ModuleEntry entry, ModuleEntrySection section, Stream outStream)
         {
-            using (var entryStream = OpenEntry(moduleStream, entry))
+            AssertContainsEntry(entry);
+            using (var entryStream = OpenEntry(moduleStream, entry, section))
                 entryStream.CopyTo(outStream);
         }
 
@@ -110,14 +150,16 @@ namespace FiveLib.Ausar.Module
         /// </summary>
         /// <param name="moduleStream">A stream open on the module file.</param>
         /// <param name="entry">The entry.</param>
+        /// <param name="section">The section to extract.</param>
         /// <param name="filePath">The path of the output file to create.</param>
-        public void ExtractEntry(Stream moduleStream, ModuleEntry entry, string filePath)
+        public void ExtractEntry(Stream moduleStream, ModuleEntry entry, ModuleEntrySection section, string filePath)
         {
+            AssertContainsEntry(entry);
             var directories = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(directories))
                 Directory.CreateDirectory(directories);
             using (var fileStream = File.Create(filePath))
-                ExtractEntry(moduleStream, entry, fileStream);
+                ExtractEntry(moduleStream, entry, section, fileStream);
         }
 
         /// <summary>
@@ -159,6 +201,12 @@ namespace FiveLib.Ausar.Module
         {
             var header = BinarySerializer.Deserialize<ModuleFileHeaderStruct>(stream);
             return header.Id;
+        }
+
+        private void AssertContainsEntry(ModuleEntry entry)
+        {
+            if (!ContainsEntry(entry))
+                throw new ArgumentException("The entry does not belong to the module");
         }
     }
 }
