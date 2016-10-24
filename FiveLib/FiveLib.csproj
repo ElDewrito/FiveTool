@@ -50,6 +50,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ausar\Cache\CacheHeader.cs" />
+    <Compile Include="Ausar\Cache\DataBlockDefinition.cs" />
+    <Compile Include="Ausar\Cache\DataReferenceDefinition.cs" />
+    <Compile Include="Ausar\Cache\StringIdDefinition.cs" />
+    <Compile Include="Ausar\Cache\Structures\CacheHeaderStruct.cs" />
+    <Compile Include="Ausar\Cache\Structures\DataBlockDefinitionStruct.cs" />
+    <Compile Include="Ausar\Cache\Structures\DataReferenceDefinitionStruct.cs" />
+    <Compile Include="Ausar\Cache\Structures\StringIdDefinitionStruct.cs" />
+    <Compile Include="Ausar\Cache\Structures\TagDependencyStruct.cs" />
+    <Compile Include="Ausar\Cache\Structures\TagReferenceDefinitionStruct.cs" />
+    <Compile Include="Ausar\Cache\Structures\TagStructDefinitionStruct.cs" />
+    <Compile Include="Ausar\Cache\TagDependency.cs" />
+    <Compile Include="Ausar\Cache\TagReferenceDefinition.cs" />
+    <Compile Include="Ausar\Cache\TagStructDefinition.cs" />
+    <Compile Include="Ausar\Cache\TagStructType.cs" />
     <Compile Include="Ausar\Memory\Stl\IStlHash.cs" />
     <Compile Include="Ausar\Memory\Stl\StlList.cs" />
     <Compile Include="Ausar\Memory\Stl\StlPair.cs" />
@@ -75,7 +90,7 @@
     <Compile Include="Ausar\Module\Structures\ModuleEntryStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleFileHeaderStruct.cs" />
     <Compile Include="Ausar\Module\Structures\ModuleStruct.cs" />
-    <Compile Include="Ausar\Tags\StringId.cs" />
+    <Compile Include="Ausar\StringId.cs" />
     <Compile Include="Common\BinarySearch.cs" />
     <Compile Include="Common\Fnv1A64Hash.cs" />
     <Compile Include="Memory\Pointer64.cs" />

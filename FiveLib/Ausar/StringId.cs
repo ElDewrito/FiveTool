@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Murmur;
 
-namespace FiveLib.Ausar.Tags
+namespace FiveLib.Ausar
 {
     /// <summary>
     /// A Blam string_id value.

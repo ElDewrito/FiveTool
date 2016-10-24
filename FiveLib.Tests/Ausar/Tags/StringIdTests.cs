@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FiveLib.Ausar.Tags;
+using FiveLib.Ausar;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FiveLib.Tests.Ausar.Tags
