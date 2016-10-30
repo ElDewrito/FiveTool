@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Ausar\Cache\CacheHeader.cs" />
     <Compile Include="Ausar\Cache\DataBlockDefinition.cs" />
+    <Compile Include="Ausar\Cache\DataBlockSection.cs" />
     <Compile Include="Ausar\Cache\DataReferenceDefinition.cs" />
     <Compile Include="Ausar\Cache\StringIdDefinition.cs" />
     <Compile Include="Ausar\Cache\Structures\CacheHeaderStruct.cs" />

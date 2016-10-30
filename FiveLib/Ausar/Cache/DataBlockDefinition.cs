@@ -13,7 +13,7 @@ namespace FiveLib.Ausar.Cache
         {
             Size = s.Size;
             Unknown4 = s.Unknown4;
-            Unknown6 = s.Unknown6;
+            Section = s.Section;
             Offset = s.Offset;
         }
 
@@ -21,7 +21,7 @@ namespace FiveLib.Ausar.Cache
 
         public short Unknown4 { get; }
 
-        public short Unknown6 { get; }
+        public DataBlockSection Section { get; }
 
         public ulong Offset { get; }
     }
