@@ -14,7 +14,7 @@ namespace FiveLib.Common
     {
         private readonly MemoryStream _stream;
         private readonly Encoding _encoding;
-        private readonly byte[] _nullTerminator;
+        private readonly byte[] _terminator;
 
         /// <summary>
         /// Constructs an empty <see cref="StringBlob"/>.
@@ -24,7 +24,9 @@ namespace FiveLib.Common
         {
             _stream = new MemoryStream();
             _encoding = encoding;
-            _nullTerminator = _encoding.GetBytes("\0");
+            _terminator = _encoding.GetBytes("\0");
+            if (_terminator.Length != 4 && _terminator.Length != 2 && _terminator.Length != 1)
+                throw new ArgumentException("Unsupported encoding");
         }
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace FiveLib.Common
             var offset = (int)_stream.Position;
             var bytes = _encoding.GetBytes(str);
             _stream.Write(bytes, 0, bytes.Length);
-            _stream.Write(_nullTerminator, 0, _nullTerminator.Length);
+            _stream.Write(_terminator, 0, _terminator.Length);
             return offset;
         }
 
@@ -67,29 +69,35 @@ namespace FiveLib.Common
         {
             if (offset < 0 || offset >= Length)
                 throw new ArgumentOutOfRangeException(nameof(offset));
-
-            // Decode characters until a null terminator is reached
-            // We have to decode up to 2 chars at a time in order to handle large code points correctly
-            var result = new StringBuilder();
             var buffer = _stream.GetBuffer();
-            var decoder = _encoding.GetDecoder();
-            var chars = new char[2];
-            var maxByteCount = _encoding.GetMaxByteCount(chars.Length);
-            while (offset < _stream.Length)
+            switch (_terminator.Length)
             {
-                int bytesUsed, charsUsed;
-                bool completed;
-                var byteCount = Math.Min((int)(_stream.Length - offset), maxByteCount);
-                decoder.Convert(buffer, offset, byteCount, chars, 0, chars.Length, false, out bytesUsed, out charsUsed, out completed);
-                for (var i = 0; i < charsUsed; i++)
-                {
-                    if (chars[i] == '\0')
-                        return result.ToString();
-                    result.Append(chars[i]);
-                }
-                offset += bytesUsed;
+                case 1: return GetStringAtOffset8(buffer, offset, (int)_stream.Length, _encoding);
+                case 2: return GetStringAtOffset16(buffer, offset, (int)_stream.Length & ~2, _encoding);
+                case 4: return GetStringAtOffset32(buffer, offset, (int)_stream.Length & ~4, _encoding);
+                default: throw new InvalidOperationException("Unsupported encoding");
             }
-            return result.ToString();
+        }
+
+        private static string GetStringAtOffset8(byte[] buffer, int offset, int maxLength, Encoding encoding)
+        {
+            int i;
+            for (i = offset; buffer[i] != 0 && i < maxLength; i++) ;
+            return encoding.GetString(buffer, offset, i - offset);
+        }
+
+        private static string GetStringAtOffset16(byte[] buffer, int offset, int maxLength, Encoding encoding)
+        {
+            int i;
+            for (i = offset; BitConverter.ToInt16(buffer, i) != 0 && i < maxLength; i += 2) ;
+            return encoding.GetString(buffer, offset, i - offset);
+        }
+
+        private static string GetStringAtOffset32(byte[] buffer, int offset, int maxLength, Encoding encoding)
+        {
+            int i;
+            for (i = offset; BitConverter.ToInt32(buffer, i) != 0 && i < maxLength; i += 4) ;
+            return encoding.GetString(buffer, offset, i - offset);
         }
 
         /// <summary>
