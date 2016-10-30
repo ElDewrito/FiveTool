@@ -73,8 +73,8 @@ namespace FiveLib.Common
             switch (_terminator.Length)
             {
                 case 1: return GetStringAtOffset8(buffer, offset, (int)_stream.Length, _encoding);
-                case 2: return GetStringAtOffset16(buffer, offset, (int)_stream.Length & ~2, _encoding);
-                case 4: return GetStringAtOffset32(buffer, offset, (int)_stream.Length & ~4, _encoding);
+                case 2: return GetStringAtOffset16(buffer, offset, (int)_stream.Length & ~1, _encoding);
+                case 4: return GetStringAtOffset32(buffer, offset, (int)_stream.Length & ~3, _encoding);
                 default: throw new InvalidOperationException("Unsupported encoding");
             }
         }
